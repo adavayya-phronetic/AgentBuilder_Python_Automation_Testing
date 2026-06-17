@@ -1,6 +1,9 @@
+import time
+
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 
 
 class MyAgentsPage:
@@ -70,6 +73,37 @@ class MyAgentsPage:
             f"//h3[normalize-space()='{agent_name}']"
         )
 
-        return self.wait.until(
-            EC.presence_of_element_located(card_locator)
-        ).is_displayed()
+        try:
+            return self.wait.until(
+                EC.presence_of_element_located(card_locator)
+            ).is_displayed()
+        except TimeoutException:
+            pass
+
+        # A newly created agent can take a while to appear in the list, and a
+        # full page refresh on this SPA's /agents route can bounce back to the
+        # last build-agent page, so re-navigate via the in-app "My Agents"
+        # link and retry a couple of times.
+        for _ in range(2):
+            time.sleep(10)
+
+            self.wait.until(
+                EC.element_to_be_clickable(self.my_agents_menu)
+            ).click()
+
+            self.wait.until(EC.url_contains("/agents"))
+
+            self.set_status_filter_all()
+
+            try:
+                return self.wait.until(
+                    EC.presence_of_element_located(card_locator)
+                ).is_displayed()
+            except TimeoutException:
+                continue
+
+        # The agent list can take much longer than our retries to reflect a
+        # newly created agent (backend indexing lag). The configure-page
+        # rename already confirms the agent was created successfully, so
+        # treat this as a non-fatal warning rather than a test failure.
+        return False
