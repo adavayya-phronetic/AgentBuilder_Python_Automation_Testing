@@ -16,14 +16,19 @@ def driver(request):
     yield driver_instance
 
     try:
-        if getattr(request.node, "rep_call", None) and request.node.rep_call.failed:
-            os.makedirs("Reports/failures", exist_ok=True)
+        rep_call = getattr(request.node, "rep_call", None)
+        if rep_call is not None:
             test_name = request.node.name
-            driver_instance.save_screenshot(f"Reports/failures/{test_name}.png")
-            with open(f"Reports/failures/{test_name}.html", "w", encoding="utf-8") as f:
-                f.write(driver_instance.page_source)
+            if rep_call.failed:
+                os.makedirs("Screenshot/Failed", exist_ok=True)
+                driver_instance.save_screenshot(f"Screenshot/Failed/{test_name}.png")
+                with open(f"Screenshot/Failed/{test_name}.html", "w", encoding="utf-8") as f:
+                    f.write(driver_instance.page_source)
+            elif rep_call.passed:
+                os.makedirs("Screenshot/Passed", exist_ok=True)
+                driver_instance.save_screenshot(f"Screenshot/Passed/{test_name}.png")
     except Exception as e:
-        print(f"Failed to capture failure artifacts: {e}")
+        print(f"Failed to capture test artifacts: {e}")
     finally:
         _quit_driver(driver_instance)
 
@@ -72,6 +77,17 @@ def pytest_runtest_makereport(item, call):
     outcome = yield
     rep = outcome.get_result()
     setattr(item, f"rep_{rep.when}", rep)
+
+
+def pytest_sessionfinish(session, exitstatus):
+    try:
+        subprocess.run(
+            ["allure", "generate", "Reports/Allure_reports", "-o", "Reports/reports_html", "--clean"],
+            capture_output=True,
+            shell=True,
+        )
+    except Exception as e:
+        print(f"Failed to generate Allure HTML report: {e}")
 
 
 

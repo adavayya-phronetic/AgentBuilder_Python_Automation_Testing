@@ -1,0 +1,4 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Agent URL: https://agent-builder.phronetic.ai/build-agent/configure
+Generated agent name: Summary & Action Assistant
+Agent created successfully: Summary & Action Assistant
