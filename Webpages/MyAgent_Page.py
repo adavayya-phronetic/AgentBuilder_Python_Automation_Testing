@@ -37,6 +37,11 @@ class MyAgentsPage:
             "//div[@role='option' and normalize-space()='All']"
         )
 
+        self.search_input = (
+            By.XPATH,
+            "//input[@type='search' or contains(@placeholder,'Search')]"
+        )
+
     def click_my_agents(self):
         self.wait.until(
             EC.element_to_be_clickable(
@@ -66,6 +71,28 @@ class MyAgentsPage:
         self.wait.until(
             EC.element_to_be_clickable(self.status_option_all)
         ).click()
+
+    def search_agent(self, agent_name):
+        search_box = self.wait.until(
+            EC.visibility_of_element_located(self.search_input)
+        )
+        search_box.clear()
+        search_box.send_keys(agent_name)
+
+    def click_agent_card(self, agent_name):
+        card_locator = (
+            By.XPATH,
+            f"//h3[normalize-space()='{agent_name}']"
+        )
+
+        card = self.wait.until(
+            EC.presence_of_element_located(card_locator)
+        )
+
+        # A hover-reveal overlay sits on top of the card and intercepts
+        # normal Selenium clicks, so dispatch the click via JS instead.
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", card)
+        self.driver.execute_script("arguments[0].click();", card)
 
     def verify_agent_card(self, agent_name):
         card_locator = (

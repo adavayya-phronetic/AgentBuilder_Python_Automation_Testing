@@ -1,0 +1,49 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Agent URL: https://agent-builder.phronetic.ai/build-agent/configure
+Failed to capture test artifacts: Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7ff752793fa5+14925]
+	chromedriver!GetHandleVerifier [0x7ff752794000+14980]
+	chromedriver!(No symbol) [0x7ff7522d7726]
+	chromedriver!(No symbol) [0x7ff752323083]
+	chromedriver!(No symbol) [0x7ff75235a2d2]
+	chromedriver!(No symbol) [0x7ff7523540d2]
+	chromedriver!(No symbol) [0x7ff752353892]
+	chromedriver!(No symbol) [0x7ff7522a03e5]
+	chromedriver!GetHandleVerifier [0x7ff752d77591+5f7f11]
+	chromedriver!GetHandleVerifier [0x7ff752d71902+5f2282]
+	chromedriver!GetHandleVerifier [0x7ff752d97115+617a95]
+	chromedriver!GetHandleVerifier [0x7ff7527b1dce+3274e]
+	chromedriver!GetHandleVerifier [0x7ff7527ba82c+3b1ac]
+	chromedriver!(No symbol) [0x7ff75229f188]
+	chromedriver!GetHandleVerifier [0x7ff752f47b58+7c84d8]
+	KERNEL32!BaseThreadInitThunk [0x7ff8015ee957+17]
+	ntdll!RtlUserThreadStart [0x7ff802b07c1c+2c]
+
+Current URL: https://agent-builder.phronetic.ai/auth
+Agent URL: https://agent-builder.phronetic.ai/build-agent/configure
+Generated agent name: Fitness Assistant
+Failed to capture test artifacts: Message: invalid session id: session deleted as the browser has closed the connection
+from disconnected: not connected to DevTools
+  (Session info: chrome=149.0.7827.155); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7ff752793fa5+14925]
+	chromedriver!GetHandleVerifier [0x7ff752794000+14980]
+	chromedriver!(No symbol) [0x7ff7522d793d]
+	chromedriver!(No symbol) [0x7ff7522c2d82]
+	chromedriver!(No symbol) [0x7ff7522e90cc]
+	chromedriver!(No symbol) [0x7ff752361aa0]
+	chromedriver!(No symbol) [0x7ff75237ec82]
+	chromedriver!(No symbol) [0x7ff75232401c]
+	chromedriver!(No symbol) [0x7ff752324f43]
+	chromedriver!GetHandleVerifier [0x7ff752d77591+5f7f11]
+	chromedriver!GetHandleVerifier [0x7ff752d71902+5f2282]
+	chromedriver!GetHandleVerifier [0x7ff752d97115+617a95]
+	chromedriver!GetHandleVerifier [0x7ff7527b1dce+3274e]
+	chromedriver!GetHandleVerifier [0x7ff7527ba82c+3b1ac]
+	chromedriver!GetHandleVerifier [0x7ff75279d744+1e0c4]
+	chromedriver!GetHandleVerifier [0x7ff75279d8d4+1e254]
+	chromedriver!GetHandleVerifier [0x7ff752781447+1dc7]
+	KERNEL32!BaseThreadInitThunk [0x7ff8015ee957+17]
+	ntdll!RtlUserThreadStart [0x7ff802b07c1c+2c]
+

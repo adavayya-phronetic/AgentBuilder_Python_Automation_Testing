@@ -1,0 +1,2 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Uploaded file for agent 'Text Summarizer Assistant': C:\Users\adavayya\PycharmProjects\PythonProject\Screenshot\Passed\test_login_logout[chrome].png

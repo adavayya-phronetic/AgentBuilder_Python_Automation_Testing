@@ -1,9 +1,7 @@
-# Purpose: Test login & logout flow using POM
-
+import os
+import time
 from datetime import datetime
-
 import pytest
-
 from Webpages.landing_page import LandingPage
 from Webpages.login_page import LoginPage
 from Webpages.dashboard_page import DashboardPage
@@ -131,7 +129,7 @@ def test_create_agent(driver):
     unique_id = datetime.now().strftime("%Y%m%d%H%M%S")
 
     agents_page.enter_prompt(
-        f"Create an assistant (ref #{unique_id}) that summarizes user-provided text into key points and action items."
+        f"Create an assistant (ref #{unique_id}) that answers general knowledge questions in a concise manner."
         f"Do not ask follow-up questions,just do the basic configration only."
     )
 
@@ -163,3 +161,121 @@ def test_create_agent(driver):
     else:
         print(f"WARNING: Agent '{agent_name}' was created but did not yet "
               f"appear in the My Agents list (backend indexing lag).")
+
+
+def test_configure_agent_io_and_upload(driver):
+
+    target_agent_name = "Text Summarizer Assistant"
+    upload_file_path = os.path.abspath(
+        os.path.join("Files", "Git_Reference_Guide.pdf")
+    )
+
+    # Landing Page
+    landing_page = LandingPage(driver)
+
+    landing_page.open_page()
+    landing_page.click_get_started()
+
+    # Login Page
+    login_page = LoginPage(driver)
+
+    login_page.login(
+        config.username,
+        config.password
+    )
+
+    # My Agents Page
+    agents_page = MyAgentsPage(driver)
+
+    agents_page.click_my_agents()
+    agents_page.search_agent(target_agent_name)
+    agents_page.click_agent_card(target_agent_name)
+
+    # Agent Configuration Page (Editor tab)
+    config_page = AgentConfigurationPage(driver)
+
+    config_page.click_editor_tab()
+    config_page.select_input_type_audio()
+    config_page.select_output_type_audio()
+    config_page.select_output_type_video()
+    config_page.upload_file(upload_file_path)
+
+    print(f"Uploaded file for agent '{target_agent_name}':", upload_file_path)
+
+
+def test_attach_tool_to_orchestrator(driver):
+
+    target_agent_name = "Text Summarizer Assistant"
+    orchestrator_card_name = "TextSummarizerOrchestrator"
+    model_provider = "Bedrock"
+    tool_names = ["Convert_Language", "Addition"]
+
+    # Landing Page
+    landing_page = LandingPage(driver)
+
+    landing_page.open_page()
+    landing_page.click_get_started()
+
+    # Login Page
+    login_page = LoginPage(driver)
+
+    login_page.login(
+        config.username,
+        config.password
+    )
+
+    # My Agents Page
+    agents_page = MyAgentsPage(driver)
+
+    agents_page.click_my_agents()
+    agents_page.search_agent(target_agent_name)
+    agents_page.click_agent_card(target_agent_name)
+
+    # Agent Configuration Page (Graph tab)
+    config_page = AgentConfigurationPage(driver)
+
+    config_page.click_graph_tab()
+    config_page.open_agent_card(orchestrator_card_name)
+    config_page.select_model_provider(model_provider)
+    chosen_model = config_page.select_random_model()
+
+    for tool_name in tool_names:
+        config_page.select_tool(tool_name)
+
+        assert config_page.is_tool_selected(tool_name), (
+            f"Tool '{tool_name}' did not appear as selected after select_tool()"
+        )
+
+    config_page.click_save()
+    config_page.click_redeploy()
+
+    # Navigate away and back in-app (a hard reload drops the session and
+    # bounces to /auth) to confirm the tool attachments actually persisted
+    # on the backend, not just in the UI. Backend indexing can lag behind
+    # the redeploy confirmation, so retry the re-navigation a few times
+    # before treating it as a real failure.
+    missing_tools = list(tool_names)
+    for attempt in range(3):
+        if attempt > 0:
+            time.sleep(10)
+
+        config_page.go_back_to_agents()
+        agents_page.search_agent(target_agent_name)
+        agents_page.click_agent_card(target_agent_name)
+        config_page.click_graph_tab()
+        config_page.open_agent_card(orchestrator_card_name)
+
+        missing_tools = [
+            t for t in tool_names if not config_page.is_tool_selected(t, timeout=30)
+        ]
+        if not missing_tools:
+            break
+
+    assert not missing_tools, (
+        f"Tool(s) {missing_tools} were not attached to '{orchestrator_card_name}' "
+        f"after save and redeploy"
+    )
+
+    print(f"Set provider '{model_provider}' with model '{chosen_model}', "
+          f"attached tools {tool_names} to '{orchestrator_card_name}', "
+          f"and redeployed agent '{target_agent_name}'.")

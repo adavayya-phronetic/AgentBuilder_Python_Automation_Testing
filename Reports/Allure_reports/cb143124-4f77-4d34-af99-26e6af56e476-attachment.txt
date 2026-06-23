@@ -1,0 +1,27 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Agent URL: https://agent-builder.phronetic.ai/build-agent/configure
+Generated agent name: Family Fun Jokester
+Failed to capture test artifacts: Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7ff752793fa5+14925]
+	chromedriver!GetHandleVerifier [0x7ff752794000+14980]
+	chromedriver!(No symbol) [0x7ff7522d7726]
+	chromedriver!(No symbol) [0x7ff752323083]
+	chromedriver!(No symbol) [0x7ff75235a2d2]
+	chromedriver!(No symbol) [0x7ff7523540d2]
+	chromedriver!(No symbol) [0x7ff752353892]
+	chromedriver!(No symbol) [0x7ff7522a03e5]
+	chromedriver!GetHandleVerifier [0x7ff752d77591+5f7f11]
+	chromedriver!GetHandleVerifier [0x7ff752d71902+5f2282]
+	chromedriver!GetHandleVerifier [0x7ff752d97115+617a95]
+	chromedriver!GetHandleVerifier [0x7ff7527b1dce+3274e]
+	chromedriver!GetHandleVerifier [0x7ff7527ba82c+3b1ac]
+	chromedriver!(No symbol) [0x7ff75229f188]
+	chromedriver!GetHandleVerifier [0x7ff752f47b58+7c84d8]
+	KERNEL32!BaseThreadInitThunk [0x7ff8015ee957+17]
+	ntdll!RtlUserThreadStart [0x7ff802b07c1c+2c]
+
+Current URL: https://agent-builder.phronetic.ai/auth
+Agent URL: https://agent-builder.phronetic.ai/build-agent/configure
+Generated agent name: Family-Friendly Joke Generator
+WARNING: Agent 'Family-Friendly Joke Generator' was created but did not yet appear in the My Agents list (backend indexing lag).

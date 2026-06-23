@@ -1,0 +1,4 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Agent URL: https://agent-builder.phronetic.ai/build-agent/configure
+Generated agent name: Job Interview Coach
+WARNING: Agent 'Job Interview Coach' was created but did not yet appear in the My Agents list (backend indexing lag).

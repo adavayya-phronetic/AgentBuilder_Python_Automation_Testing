@@ -1,3 +1,4 @@
+import random
 import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -39,6 +40,93 @@ class AgentConfigurationPage:
         self.tool_search_error = (
             By.XPATH,
             "//*[contains(text(),'I encountered an issue while searching for supporting tools')]"
+        )
+
+        self.editor_tab = (
+            By.XPATH,
+            "//*[self::button or self::a][normalize-space()='EDITOR']"
+        )
+
+        self.input_type_audio_button = (
+            By.ID,
+            "agent-definition-input-audio"
+        )
+
+        self.output_type_audio_button = (
+            By.ID,
+            "agent-definition-output-audio"
+        )
+
+        self.output_type_video_button = (
+            By.ID,
+            "agent-definition-output-video"
+        )
+
+        self.upload_to_knowledge_base_button = (
+            By.XPATH,
+            "//button[@title='Upload file to knowledge base']"
+        )
+
+        self.knowledge_base_file_input = (
+            By.XPATH,
+            "//input[@type='file' and contains(@accept,'.pdf')]"
+        )
+
+        self.pending_upload_status = (
+            By.XPATH,
+            "//span[normalize-space()='Pending']"
+        )
+
+        self.graph_tab = (
+            By.XPATH,
+            "//*[self::button or self::a][normalize-space()='GRAPH']"
+        )
+
+        self.model_provider_combobox = (
+            By.XPATH,
+            "//button[@role='combobox']"
+        )
+
+        self.model_field_button = (
+            By.XPATH,
+            "//label[starts-with(normalize-space(.),'Model') "
+            "and not(starts-with(normalize-space(.),'Model Provider'))]"
+            "/following::button[1]"
+        )
+
+        self.model_option_names = (
+            By.XPATH,
+            "//div[@role='option']//p[contains(@class,'font-semibold')]"
+        )
+
+        self.tools_select_input = (
+            By.XPATH,
+            "//*[normalize-space()='Tools']/following::input[contains(@class,'react-select__input')][1]"
+        )
+
+        self.tools_selected_chips = (
+            By.XPATH,
+            "//*[normalize-space()='Tools']/following::div[contains(@class,'react-select__multi-value__label')]"
+        )
+
+        self.save_button = (
+            By.XPATH,
+            "//button[normalize-space()='Save']"
+        )
+
+        self.redeploy_button = (
+            By.XPATH,
+            "//button[normalize-space()='Redeploy']"
+        )
+
+        self.modal_overlay = (
+            By.XPATH,
+            "//div[@data-state='open' and contains(@class,'fixed') and contains(@class,'inset-0')]"
+        )
+
+        self.deploy_confirm_button = (
+            By.XPATH,
+            "//div[@role='dialog']//button[normalize-space()='Continue']"
         )
 
     def wait_for_agent_creation(self):
@@ -120,6 +208,150 @@ class AgentConfigurationPage:
             agent_name = self._wait_for_name_to_stabilize(agent_name)
 
         return agent_name
+
+    def click_editor_tab(self):
+        self.wait.until(
+            EC.element_to_be_clickable(self.editor_tab)
+        ).click()
+
+    def select_input_type_audio(self):
+        self.wait.until(
+            EC.element_to_be_clickable(self.input_type_audio_button)
+        ).click()
+
+    def select_output_type_audio(self):
+        self.wait.until(
+            EC.element_to_be_clickable(self.output_type_audio_button)
+        ).click()
+
+    def select_output_type_video(self):
+        self.wait.until(
+            EC.element_to_be_clickable(self.output_type_video_button)
+        ).click()
+
+    def upload_file(self, file_path):
+        # Clicking the visible "Upload" button opens the native OS file
+        # dialog, which Selenium cannot drive and would just sit there
+        # blocking the browser. Skip the click and send the path straight
+        # to the underlying <input type="file"> instead.
+        file_input = self.wait.until(
+            EC.presence_of_element_located(self.knowledge_base_file_input)
+        )
+
+        pending_count_before = len(self.driver.find_elements(*self.pending_upload_status))
+
+        file_input.send_keys(file_path)
+
+        # The new row briefly shows "Pending" before flipping to "Completed".
+        # Wait for both transitions so the upload is actually visible on
+        # screen instead of the test racing past it.
+        WebDriverWait(self.driver, 15).until(
+            lambda d: len(d.find_elements(*self.pending_upload_status)) > pending_count_before
+        )
+        WebDriverWait(self.driver, 60).until(
+            lambda d: len(d.find_elements(*self.pending_upload_status)) <= pending_count_before
+        )
+
+    def click_graph_tab(self):
+        self.wait.until(
+            EC.element_to_be_clickable(self.graph_tab)
+        ).click()
+
+    def open_agent_card(self, card_name):
+        card_locator = (
+            By.XPATH,
+            f"//*[contains(text(),'{card_name}')]"
+        )
+
+        card = self.wait.until(
+            EC.presence_of_element_located(card_locator)
+        )
+
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", card)
+        self.driver.execute_script("arguments[0].click();", card)
+
+    def select_model_provider(self, provider_name):
+        self.wait.until(
+            EC.element_to_be_clickable(self.model_provider_combobox)
+        ).click()
+
+        option_locator = (
+            By.XPATH,
+            f"//div[@role='option' and normalize-space()='{provider_name}']"
+        )
+
+        self.wait.until(
+            EC.element_to_be_clickable(option_locator)
+        ).click()
+
+    def select_random_model(self):
+        model_button = self.wait.until(
+            EC.element_to_be_clickable(self.model_field_button)
+        )
+
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", model_button)
+        self.driver.execute_script("arguments[0].click();", model_button)
+
+        options = self.wait.until(
+            EC.presence_of_all_elements_located(self.model_option_names)
+        )
+
+        chosen = random.choice(options)
+        chosen_name = chosen.text
+
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", chosen)
+        self.driver.execute_script("arguments[0].click();", chosen)
+
+        return chosen_name
+
+    def select_tool(self, tool_name):
+        if self.is_tool_selected(tool_name):
+            return
+
+        self.wait.until(
+            EC.element_to_be_clickable(self.tools_select_input)
+        ).click()
+
+        option_locator = (
+            By.XPATH,
+            f"//div[contains(@class,'react-select__option') and normalize-space()='{tool_name}']"
+        )
+
+        self.wait.until(
+            EC.element_to_be_clickable(option_locator)
+        ).click()
+
+    def is_tool_selected(self, tool_name, timeout=5):
+        try:
+            chips = WebDriverWait(self.driver, timeout).until(
+                EC.presence_of_all_elements_located(self.tools_selected_chips)
+            )
+            return any(chip.text.strip() == tool_name for chip in chips)
+        except TimeoutException:
+            return False
+
+    def click_save(self):
+        self.wait.until(
+            EC.element_to_be_clickable(self.save_button)
+        ).click()
+
+    def click_redeploy(self):
+        self.wait.until(
+            EC.element_to_be_clickable(self.redeploy_button)
+        ).click()
+
+        # Redeploying opens a "Are you sure you want to deploy changes?"
+        # confirmation dialog that must be confirmed before it clears.
+        self.wait.until(
+            EC.element_to_be_clickable(self.deploy_confirm_button)
+        ).click()
+
+        try:
+            WebDriverWait(self.driver, 120).until(
+                EC.invisibility_of_element_located(self.modal_overlay)
+            )
+        except TimeoutException:
+            pass
 
     def go_back_to_agents(self):
         self.wait.until(

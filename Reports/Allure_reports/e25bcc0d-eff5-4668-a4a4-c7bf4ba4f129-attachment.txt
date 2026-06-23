@@ -1,0 +1,28 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Agent URL: https://agent-builder.phronetic.ai/build-agent/configure
+Generated agent name: FitHelp
+Failed to capture test artifacts: Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception
+Stacktrace:
+	msedgedriver!GetHandleVerifier [0x7ff66c796925+e305]
+	msedgedriver!GetHandleVerifier [0x7ff66c796984+e364]
+	msedgedriver!(No symbol) [0x7ff66c1451ae]
+	msedgedriver!(No symbol) [0x7ff66c183275]
+	msedgedriver!(No symbol) [0x7ff66c1ae792]
+	msedgedriver!(No symbol) [0x7ff66c13ce19]
+	msedgedriver!(No symbol) [0x7ff66c1aad90]
+	msedgedriver!(No symbol) [0x7ff66c1aa642]
+	msedgedriver!(No symbol) [0x7ff66c11d695]
+	msedgedriver!(No symbol) [0x7ff66c3d2ca1]
+	msedgedriver!(No symbol) [0x7ff66c3cf3f8]
+	msedgedriver!(No symbol) [0x7ff66c3dfe85]
+	msedgedriver!GetHandleVerifier [0x7ff66c7b28d1+2a2b1]
+	msedgedriver!GetHandleVerifier [0x7ff66c7bb676+33056]
+	msedgedriver!(No symbol) [0x7ff66c11c05b]
+	msedgedriver!GetHandleVerifier [0x7ff66c9fb9c8+2733a8]
+	KERNEL32!BaseThreadInitThunk [0x7ff8015ee957+17]
+	ntdll!RtlUserThreadStart [0x7ff802b07c1c+2c]
+
+Current URL: https://agent-builder.phronetic.ai/auth
+Agent URL: https://agent-builder.phronetic.ai/build-agent/configure
+Generated agent name: Fitness Buddy
+Agent created successfully: Fitness Buddy

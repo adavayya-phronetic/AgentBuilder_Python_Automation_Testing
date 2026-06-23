@@ -1,0 +1,2 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Set provider 'Bedrock' with model 'Qwen 3 32B', attached tool 'Convert_Language' to 'TextSummarizerOrchestrator', and redeployed agent 'Text Summarizer Assistant'.
