@@ -1,0 +1,3 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Uploaded file for agent 'Text Summarizer Assistant': C:\Users\adavayya\PycharmProjects\PythonProject\Files\Git_Reference_Guide.pdf
+Deleted file 'Git_Reference_Guide.pdf' from knowledge base for agent 'Text Summarizer Assistant'.

@@ -129,7 +129,7 @@ def test_create_agent(driver):
     unique_id = datetime.now().strftime("%Y%m%d%H%M%S")
 
     agents_page.enter_prompt(
-        f"Create an assistant (ref #{unique_id}) that answers general knowledge questions in a concise manner."
+        f"Create an assistant (ref #{unique_id}) that summarizes text into three bullet points."
         f"Do not ask follow-up questions,just do the basic configration only."
     )
 
@@ -198,9 +198,34 @@ def test_configure_agent_io_and_upload(driver):
     config_page.select_input_type_audio()
     config_page.select_output_type_audio()
     config_page.select_output_type_video()
+
+    file_name = os.path.basename(upload_file_path)
+    count_before_upload = config_page.count_knowledge_base_files(file_name)
+
     config_page.upload_file(upload_file_path)
 
+    assert config_page.count_knowledge_base_files(file_name) > count_before_upload, (
+        f"'{file_name}' did not appear in the knowledge base after upload"
+    )
+
     print(f"Uploaded file for agent '{target_agent_name}':", upload_file_path)
+
+    count_before_delete = config_page.count_knowledge_base_files(file_name)
+    config_page.cancel_delete_knowledge_base_file(file_name)
+
+    assert config_page.count_knowledge_base_files(file_name) == count_before_delete, (
+        f"'{file_name}' was removed even though delete was cancelled"
+    )
+
+    print(f"Cancelled delete of '{file_name}'; file remains in knowledge base.")
+
+    config_page.delete_knowledge_base_file(file_name)
+
+    assert config_page.count_knowledge_base_files(file_name) == count_before_upload, (
+        f"'{file_name}' was not removed from the knowledge base after delete"
+    )
+
+    print(f"Deleted file '{file_name}' from knowledge base for agent '{target_agent_name}'.")
 
 
 def test_attach_tool_to_orchestrator(driver):

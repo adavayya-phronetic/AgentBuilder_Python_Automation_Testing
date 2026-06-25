@@ -1,0 +1,27 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Agent URL: https://agent-builder.phronetic.ai/build-agent/configure
+Generated agent name: Name Suggestion Assistant
+Failed to capture test artifacts: Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7ff7d2a83fa5+14925]
+	chromedriver!GetHandleVerifier [0x7ff7d2a84000+14980]
+	chromedriver!(No symbol) [0x7ff7d25c7726]
+	chromedriver!(No symbol) [0x7ff7d2613083]
+	chromedriver!(No symbol) [0x7ff7d264a2d2]
+	chromedriver!(No symbol) [0x7ff7d26440d2]
+	chromedriver!(No symbol) [0x7ff7d2643892]
+	chromedriver!(No symbol) [0x7ff7d25903e5]
+	chromedriver!GetHandleVerifier [0x7ff7d3067591+5f7f11]
+	chromedriver!GetHandleVerifier [0x7ff7d3061902+5f2282]
+	chromedriver!GetHandleVerifier [0x7ff7d3087115+617a95]
+	chromedriver!GetHandleVerifier [0x7ff7d2aa1dce+3274e]
+	chromedriver!GetHandleVerifier [0x7ff7d2aaa82c+3b1ac]
+	chromedriver!(No symbol) [0x7ff7d258f188]
+	chromedriver!GetHandleVerifier [0x7ff7d3237b58+7c84d8]
+	KERNEL32!BaseThreadInitThunk [0x7ff8015ee957+17]
+	ntdll!RtlUserThreadStart [0x7ff802b07c1c+2c]
+
+Current URL: https://agent-builder.phronetic.ai/auth
+Agent URL: https://agent-builder.phronetic.ai/build-agent/configure
+Generated agent name: NameGenie
+Agent created successfully: NameGenie

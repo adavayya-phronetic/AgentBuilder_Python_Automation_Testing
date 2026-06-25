@@ -77,6 +77,11 @@ class AgentConfigurationPage:
             "//span[normalize-space()='Pending']"
         )
 
+        self.knowledge_base_row_xpath = (
+            "//span[contains(@class,'truncate') and normalize-space()='{file_name}']"
+            "/ancestor::div[contains(@class,'group') and contains(@class,'relative')][1]"
+        )
+
         self.graph_tab = (
             By.XPATH,
             "//*[self::button or self::a][normalize-space()='GRAPH']"
@@ -250,6 +255,49 @@ class AgentConfigurationPage:
         )
         WebDriverWait(self.driver, 60).until(
             lambda d: len(d.find_elements(*self.pending_upload_status)) <= pending_count_before
+        )
+
+    def count_knowledge_base_files(self, file_name):
+        locator = (By.XPATH, self.knowledge_base_row_xpath.format(file_name=file_name))
+        return len(self.driver.find_elements(*locator))
+
+    def delete_knowledge_base_file(self, file_name, index=0):
+        row_xpath = f"({self.knowledge_base_row_xpath.format(file_name=file_name)})[{index + 1}]"
+        before_count = self.count_knowledge_base_files(file_name)
+
+        delete_locator = (By.XPATH, row_xpath + "//button[@title='Delete file']")
+        self.wait.until(
+            EC.element_to_be_clickable(delete_locator)
+        ).click()
+
+        # Deleting shows an inline "Confirm"/"Cancel" pair in place of the
+        # trash icon rather than opening a separate dialog.
+        confirm_locator = (By.XPATH, row_xpath + "//button[normalize-space()='Confirm']")
+        WebDriverWait(self.driver, 5).until(
+            EC.element_to_be_clickable(confirm_locator)
+        ).click()
+
+        WebDriverWait(self.driver, 15).until(
+            lambda d: self.count_knowledge_base_files(file_name) < before_count
+        )
+
+    def cancel_delete_knowledge_base_file(self, file_name, index=0):
+        row_xpath = f"({self.knowledge_base_row_xpath.format(file_name=file_name)})[{index + 1}]"
+
+        delete_locator = (By.XPATH, row_xpath + "//button[@title='Delete file']")
+        self.wait.until(
+            EC.element_to_be_clickable(delete_locator)
+        ).click()
+
+        cancel_locator = (By.XPATH, row_xpath + "//button[normalize-space()='Cancel']")
+        WebDriverWait(self.driver, 5).until(
+            EC.element_to_be_clickable(cancel_locator)
+        ).click()
+
+        # Cancel should revert the row back to showing the delete icon
+        # instead of the Confirm/Cancel pair.
+        WebDriverWait(self.driver, 5).until(
+            EC.element_to_be_clickable(delete_locator)
         )
 
     def click_graph_tab(self):
