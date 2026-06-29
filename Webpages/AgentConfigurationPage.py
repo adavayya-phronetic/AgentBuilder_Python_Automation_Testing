@@ -3,7 +3,7 @@ import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, WebDriverException
 
 
 class AgentConfigurationPage:
@@ -85,6 +85,11 @@ class AgentConfigurationPage:
         self.graph_tab = (
             By.XPATH,
             "//*[self::button or self::a][normalize-space()='GRAPH']"
+        )
+
+        self.graph_node = (
+            By.CSS_SELECTOR,
+            ".react-flow__node"
         )
 
         self.model_provider_combobox = (
@@ -179,7 +184,19 @@ class AgentConfigurationPage:
     def wait_for_agent_name_update(self):
 
         def name_updated_or_tool_error(d):
-            name = d.find_element(*self.agent_name).text.strip()
+            element = d.find_element(*self.agent_name)
+            if element is None:
+                # Selenium can return None instead of raising when the
+                # browser window/tab crashes mid-poll. Surface it as a real
+                # WebDriverException so it propagates and is recognized by
+                # the test's @pytest.mark.flaky(only_rerun=[...]) check,
+                # instead of failing here with an opaque AttributeError.
+                raise WebDriverException(
+                    "Agent name element became unavailable; "
+                    "the browser window/tab may have crashed."
+                )
+
+            name = element.text.strip()
             if name != "Untitled Agent":
                 return True
             return self.is_tool_search_error_present()
@@ -317,6 +334,29 @@ class AgentConfigurationPage:
 
         self.driver.execute_script("arguments[0].scrollIntoView(true);", card)
         self.driver.execute_script("arguments[0].click();", card)
+
+    def get_agent_card_names(self):
+        # MCP tool nodes (data-id contains "mcp") sit on the graph alongside
+        # agent/orchestrator nodes but don't open the Model/Tools panel, so
+        # they're excluded. An agent node's display name is the first line
+        # of its text (name, description, model, role stacked underneath).
+        nodes = self.wait.until(
+            EC.presence_of_all_elements_located(self.graph_node)
+        )
+
+        names = []
+        for node in nodes:
+            data_id = node.get_attribute("data-id") or ""
+            if "mcp" in data_id:
+                continue
+
+            text = node.text.strip()
+            if not text:
+                continue
+
+            names.append(text.splitlines()[0].strip())
+
+        return names
 
     def select_model_provider(self, provider_name):
         self.wait.until(

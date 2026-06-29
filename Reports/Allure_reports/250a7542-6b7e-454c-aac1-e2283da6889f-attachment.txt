@@ -1,0 +1,3 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Testing agent 'Triple Bullet Summarizer', card 'Text Summarization Orchestrator', provider 'Bedrock', model 'Claude 3 Haiku'
+Set provider 'Bedrock' with model 'Claude 3 Haiku', attached tools ['Convert_Language', 'Addition'] to 'Text Summarization Orchestrator', and redeployed agent 'Triple Bullet Summarizer'.

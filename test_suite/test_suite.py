@@ -1,7 +1,9 @@
 import os
+import random
 import time
 from datetime import datetime
 import pytest
+from selenium.common.exceptions import InvalidSessionIdException, WebDriverException
 from Webpages.landing_page import LandingPage
 from Webpages.login_page import LoginPage
 from Webpages.dashboard_page import DashboardPage
@@ -10,6 +12,7 @@ from Webpages.AgentConfigurationPage import AgentConfigurationPage
 from Utility import config
 
 
+@pytest.mark.login
 def test_login_logout(driver):
 
     # Landing Page
@@ -32,6 +35,7 @@ def test_login_logout(driver):
     dashboard.logout()
 
 
+@pytest.mark.login
 def test_invalid_login(driver):
 
     # Landing Page
@@ -56,6 +60,7 @@ def test_invalid_login(driver):
     print("Invalid login error message:", error_message)
 
 
+@pytest.mark.login
 def test_invalid_password(driver):
 
     # Landing Page
@@ -80,6 +85,7 @@ def test_invalid_password(driver):
     print("Invalid password error message:", error_message)
 
 
+@pytest.mark.login
 def test_empty_login_fields(driver):
 
     # Landing Page
@@ -104,7 +110,8 @@ def test_empty_login_fields(driver):
     print("Empty password field error:", password_error)
 
 
-@pytest.mark.flaky(reruns=1, reruns_delay=5, only_rerun=["InvalidSessionIdException", "WebDriverException"])
+@pytest.mark.agent_creation
+@pytest.mark.flaky(reruns=1, reruns_delay=5, only_rerun=[InvalidSessionIdException, WebDriverException])
 def test_create_agent(driver):
 
     # Landing Page
@@ -163,9 +170,9 @@ def test_create_agent(driver):
               f"appear in the My Agents list (backend indexing lag).")
 
 
+@pytest.mark.knowledge_base
 def test_configure_agent_io_and_upload(driver):
 
-    target_agent_name = "Text Summarizer Assistant"
     upload_file_path = os.path.abspath(
         os.path.join("Files", "Git_Reference_Guide.pdf")
     )
@@ -188,6 +195,12 @@ def test_configure_agent_io_and_upload(driver):
     agents_page = MyAgentsPage(driver)
 
     agents_page.click_my_agents()
+
+    active_agent_names = agents_page.get_active_agent_names()
+    assert active_agent_names, "No active agents found in the agent card list"
+
+    target_agent_name = random.choice(active_agent_names)
+
     agents_page.search_agent(target_agent_name)
     agents_page.click_agent_card(target_agent_name)
 
@@ -228,10 +241,9 @@ def test_configure_agent_io_and_upload(driver):
     print(f"Deleted file '{file_name}' from knowledge base for agent '{target_agent_name}'.")
 
 
+@pytest.mark.tool_attachment
 def test_attach_tool_to_orchestrator(driver):
 
-    target_agent_name = "Text Summarizer Assistant"
-    orchestrator_card_name = "TextSummarizerOrchestrator"
     model_provider = "Bedrock"
     tool_names = ["Convert_Language", "Addition"]
 
@@ -253,6 +265,12 @@ def test_attach_tool_to_orchestrator(driver):
     agents_page = MyAgentsPage(driver)
 
     agents_page.click_my_agents()
+
+    active_agent_names = agents_page.get_active_agent_names()
+    assert active_agent_names, "No active agents found in the agent card list"
+
+    target_agent_name = random.choice(active_agent_names)
+
     agents_page.search_agent(target_agent_name)
     agents_page.click_agent_card(target_agent_name)
 
@@ -260,9 +278,18 @@ def test_attach_tool_to_orchestrator(driver):
     config_page = AgentConfigurationPage(driver)
 
     config_page.click_graph_tab()
+
+    card_names = config_page.get_agent_card_names()
+    assert card_names, f"No configurable agent cards found in the graph for '{target_agent_name}'"
+
+    orchestrator_card_name = random.choice(card_names)
+
     config_page.open_agent_card(orchestrator_card_name)
     config_page.select_model_provider(model_provider)
     chosen_model = config_page.select_random_model()
+
+    print(f"Testing agent '{target_agent_name}', card '{orchestrator_card_name}', "
+          f"provider '{model_provider}', model '{chosen_model}'")
 
     for tool_name in tool_names:
         config_page.select_tool(tool_name)

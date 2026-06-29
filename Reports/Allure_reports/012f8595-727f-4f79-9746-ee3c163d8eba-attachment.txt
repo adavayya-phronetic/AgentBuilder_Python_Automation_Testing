@@ -1,0 +1,3 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Testing agent 'Three Bullet Summarizer', card 'Summarization Orchestrator', provider 'Bedrock', model 'Qwen3 Coder 30B A3B Instruct'
+Set provider 'Bedrock' with model 'Qwen3 Coder 30B A3B Instruct', attached tools ['Convert_Language', 'Addition'] to 'Summarization Orchestrator', and redeployed agent 'Three Bullet Summarizer'.

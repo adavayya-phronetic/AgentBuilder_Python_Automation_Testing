@@ -37,6 +37,16 @@ class MyAgentsPage:
             "//div[@role='option' and normalize-space()='All']"
         )
 
+        self.status_option_active = (
+            By.XPATH,
+            "//div[@role='option' and normalize-space()='Active']"
+        )
+
+        self.agent_card_title = (
+            By.XPATH,
+            "//h3"
+        )
+
         self.search_input = (
             By.XPATH,
             "//input[@type='search' or contains(@placeholder,'Search')]"
@@ -72,6 +82,24 @@ class MyAgentsPage:
             EC.element_to_be_clickable(self.status_option_all)
         ).click()
 
+    def set_status_filter_active(self):
+        self.wait.until(
+            EC.element_to_be_clickable(self.status_filter_combobox)
+        ).click()
+
+        self.wait.until(
+            EC.element_to_be_clickable(self.status_option_active)
+        ).click()
+
+    def get_active_agent_names(self):
+        self.set_status_filter_active()
+
+        cards = self.wait.until(
+            EC.presence_of_all_elements_located(self.agent_card_title)
+        )
+
+        return [card.text.strip() for card in cards if card.text.strip()]
+
     def search_agent(self, agent_name):
         search_box = self.wait.until(
             EC.visibility_of_element_located(self.search_input)
@@ -79,11 +107,21 @@ class MyAgentsPage:
         search_box.clear()
         search_box.send_keys(agent_name)
 
-    def click_agent_card(self, agent_name):
-        card_locator = (
+    @staticmethod
+    def _case_insensitive_card_locator(agent_name):
+        # Card titles are styled with CSS `capitalize`, which changes how the
+        # name renders but not the underlying DOM text node, so an
+        # exact-case XPath match against a name read back from `.text` can
+        # miss (e.g. rendered "AI Travel Agent" vs. actual "AI Travel agent").
+        return (
             By.XPATH,
-            f"//h3[normalize-space()='{agent_name}']"
+            "//h3[translate(normalize-space(.), "
+            "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')="
+            f"'{agent_name.lower()}']"
         )
+
+    def click_agent_card(self, agent_name):
+        card_locator = self._case_insensitive_card_locator(agent_name)
 
         card = self.wait.until(
             EC.presence_of_element_located(card_locator)
@@ -95,10 +133,7 @@ class MyAgentsPage:
         self.driver.execute_script("arguments[0].click();", card)
 
     def verify_agent_card(self, agent_name):
-        card_locator = (
-            By.XPATH,
-            f"//h3[normalize-space()='{agent_name}']"
-        )
+        card_locator = self._case_insensitive_card_locator(agent_name)
 
         try:
             return self.wait.until(

@@ -1,0 +1,24 @@
+Failed to capture test artifacts: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: MicrosoftEdge=149.0.4022.80)
+Stacktrace:
+	msedgedriver!GetHandleVerifier [0x7ff7c1312385+e065]
+	msedgedriver!GetHandleVerifier [0x7ff7c13123e4+e0c4]
+	msedgedriver!GetHandleVerifier [0x7ff7c199225a+68df3a]
+	msedgedriver!(No symbol) [0x7ff7c0c9835d]
+	msedgedriver!(No symbol) [0x7ff7c0d2305e]
+	msedgedriver!(No symbol) [0x7ff7c0d3970f]
+	msedgedriver!(No symbol) [0x7ff7c0cf487c]
+	msedgedriver!(No symbol) [0x7ff7c0cf3ad6]
+	msedgedriver!(No symbol) [0x7ff7c0cf46a3]
+	msedgedriver!(No symbol) [0x7ff7c0f51c21]
+	msedgedriver!(No symbol) [0x7ff7c0f4e378]
+	msedgedriver!(No symbol) [0x7ff7c0f5ee05]
+	msedgedriver!GetHandleVerifier [0x7ff7c132e331+2a011]
+	msedgedriver!GetHandleVerifier [0x7ff7c13370d6+32db6]
+	msedgedriver!GetHandleVerifier [0x7ff7c1319e44+15b24]
+	msedgedriver!GetHandleVerifier [0x7ff7c1319f65+15c45]
+	msedgedriver!GetHandleVerifier [0x7ff7c1306813+24f3]
+	KERNEL32!BaseThreadInitThunk [0x7ffc1f10e957+17]
+	ntdll!RtlUserThreadStart [0x7ffc2064ad6c+2c]
+
