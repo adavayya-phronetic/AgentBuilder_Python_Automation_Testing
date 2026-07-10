@@ -1,0 +1,2 @@
+Testing agent 'Section Organizer', card 'Document Organizer Orchestrator', provider 'Bedrock', model 'Mistral Large 3'
+Set provider 'Bedrock' with model 'Mistral Large 3', attached tools ['Convert_Language', 'Addition'] to 'Document Organizer Orchestrator', and redeployed agent 'Section Organizer'.

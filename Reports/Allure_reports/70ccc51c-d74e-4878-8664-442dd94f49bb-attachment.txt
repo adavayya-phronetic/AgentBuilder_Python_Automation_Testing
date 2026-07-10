@@ -1,0 +1,3 @@
+Confirmed empty-instructions validation error for orchestrator of 'Simple To-Do Assistant'.
+Confirmed whitespace-only instructions are rejected for orchestrator of 'Simple To-Do Assistant'.
+Confirmed orchestrator of 'Simple To-Do Assistant' redeploys successfully once valid instructions are restored.

@@ -1,0 +1,4 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Confirmed empty-instructions validation error for orchestrator of 'Simple To-Do Maker'.
+Confirmed whitespace-only instructions are rejected for orchestrator of 'Simple To-Do Maker'.
+Confirmed orchestrator of 'Simple To-Do Maker' redeploys successfully once valid instructions are restored.

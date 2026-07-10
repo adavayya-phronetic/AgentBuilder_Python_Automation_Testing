@@ -1,0 +1,4 @@
+Agent: Simple To-Do List Assistant
+Card: ToDoListGenerator
+Provider: Bedrock
+Model: Claude Sonnet 4.6

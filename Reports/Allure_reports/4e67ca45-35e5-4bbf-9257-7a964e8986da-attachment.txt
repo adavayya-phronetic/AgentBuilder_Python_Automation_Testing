@@ -1,0 +1,2 @@
+Testing agent 'Simple To-Do Creator', card 'ToDoListAssistant', provider 'Bedrock', model 'Claude Sonnet 4.5'
+Set provider 'Bedrock' with model 'Claude Sonnet 4.5', attached tools ['Convert_Language', 'Addition'] to 'ToDoListAssistant', and redeployed agent 'Simple To-Do Creator'.

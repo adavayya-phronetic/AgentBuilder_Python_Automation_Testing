@@ -1,0 +1,2 @@
+Testing agent 'DocSection Organizer', card 'Document Organizer Orchestrator', provider 'Bedrock', model 'qwen.qwen3-next-80b-a3b'
+Set provider 'Bedrock' with model 'qwen.qwen3-next-80b-a3b', attached tools ['Convert_Language', 'Addition'] to 'Document Organizer Orchestrator', and redeployed agent 'DocSection Organizer'.

@@ -1,0 +1,3 @@
+Confirmed empty-name validation error for orchestrator of 'Document Section Organizer'.
+Confirmed non-alphanumeric name triggers inline error for orchestrator of 'Document Section Organizer'.
+Confirmed original name restored cleanly for orchestrator of 'Document Section Organizer' with no validation errors.

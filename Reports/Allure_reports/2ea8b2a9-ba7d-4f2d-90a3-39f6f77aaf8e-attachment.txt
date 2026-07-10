@@ -1,0 +1,3 @@
+Confirmed empty-name validation error for orchestrator of 'Doc Organizer'.
+Confirmed non-alphanumeric name triggers inline error for orchestrator of 'Doc Organizer'.
+Confirmed original name restored cleanly for orchestrator of 'Doc Organizer' with no validation errors.

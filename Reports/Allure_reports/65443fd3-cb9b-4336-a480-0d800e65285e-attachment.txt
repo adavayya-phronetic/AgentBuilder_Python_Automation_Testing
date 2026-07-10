@@ -1,0 +1,3 @@
+Confirmed empty-name validation error for orchestrator of 'Basic To-Do List Assistant'.
+Confirmed non-alphanumeric name triggers inline error for orchestrator of 'Basic To-Do List Assistant'.
+Confirmed original name restored cleanly for orchestrator of 'Basic To-Do List Assistant' with no validation errors.

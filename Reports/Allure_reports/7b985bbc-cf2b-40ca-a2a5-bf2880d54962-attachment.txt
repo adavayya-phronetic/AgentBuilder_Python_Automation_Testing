@@ -1,0 +1,9 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Step 1 OK: opened Chat for agent 'Daily Helper Assistant'.
+Step 2 OK: message sent and agent responded at https://chat.phronetic.ai/OYTcWmyh5MIAqZj6/chat/ffd3b6b3c59e4c92904baff793ad5fc7
+Step 3 OK: new chat opened at https://chat.phronetic.ai/OYTcWmyh5MIAqZj6/chat?newchat=true
+Step 4 OK: 'sample_test.pdf' uploaded and agent responded with a summary.
+Step 5a OK: navigated to agent details page at https://chat.phronetic.ai/OYTcWmyh5MIAqZj6/agent
+Step 5b OK: returned to Chat at https://chat.phronetic.ai/OYTcWmyh5MIAqZj6/chat
+Step 6 OK: bug report submitted and confirmed.
+Step 7 OK: logged out and redirected to the login page: https://auth.phronetic.ai/login?client_id=chat-app&redirect_uri=https%3A%2F%2Fchat.phronetic.ai%2Fauth%2Fcallback&code_challenge=NLwtXnD4JxSQbOPrviJ3DFkndy1hb8d9gCSd5FkePsw

@@ -1,0 +1,4 @@
+Agent: To-Do List Assistant
+Card: SimpleToDoListAgent
+Provider: Bedrock
+Model: moonshot.kimi-k2-thinking

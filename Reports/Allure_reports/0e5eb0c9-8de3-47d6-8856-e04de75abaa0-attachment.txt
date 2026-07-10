@@ -1,0 +1,5 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Agent URL: https://agent-builder.phronetic.ai/build-agent/configure
+Generated agent name: To-Do List Generator
+WARNING: Agent 'To-Do List Generator' was created but did not yet appear in the My Agents list (backend indexing lag).
+Failed to capture test artifacts: HTTPConnectionPool(host='localhost', port=60267): Max retries exceeded with url: /session/fbeec59ef8365c45c81397c5372b5cbe/screenshot (Caused by NewConnectionError("HTTPConnection(host='localhost', port=60267): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))

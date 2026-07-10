@@ -1,0 +1,2 @@
+Confirmed empty-instructions validation error for sub-agent 'Document OCR Agent' of 'AI Document OCR Agent'.
+Restored original instructions for sub-agent 'Document OCR Agent'.

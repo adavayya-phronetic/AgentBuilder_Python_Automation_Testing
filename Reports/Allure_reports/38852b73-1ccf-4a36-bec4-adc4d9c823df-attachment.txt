@@ -1,0 +1,4 @@
+Agent: Simple To-Do Assistant
+Card: ToDoListOrchestrator
+Provider: Bedrock
+Model: Claude Opus 4.5

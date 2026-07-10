@@ -1,0 +1,2 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Testing agent 'Three Bullet Summarizer', card 'Summarization Orchestrator', provider 'Bedrock', model 'Claude Sonnet 4.6'

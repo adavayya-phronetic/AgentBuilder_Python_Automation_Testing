@@ -1,3 +1,4 @@
+import allure
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -19,8 +20,19 @@ class DashboardPage:
             "//div[@role='menuitem' and contains(.,'Sign out')]"
         )
 
-    def logout(self):
+        # Sign out redirects off the dashboard entirely, to the public
+        # marketing site (www.phronetic.ai) rather than a fixed in-app URL.
+        # That page is a heavier animated/hydrating SPA, so document.readyState
+        # turns "complete" well before it actually paints — waiting for a
+        # concrete visible element is what actually confirms the render, and
+        # avoids a screenshot landing mid-navigation and coming back blank.
+        self.marketing_site_get_started = (
+            By.XPATH,
+            "//*[normalize-space()='Get Started']"
+        )
 
+    @allure.step("Log out via user menu")
+    def logout(self):
         self.wait.until(
             EC.element_to_be_clickable(self.logout_dropdown)
         ).click()
@@ -28,3 +40,7 @@ class DashboardPage:
         self.wait.until(
             EC.element_to_be_clickable(self.logout_link)
         ).click()
+
+        WebDriverWait(self.driver, 30).until(
+            EC.visibility_of_element_located(self.marketing_site_get_started)
+        )

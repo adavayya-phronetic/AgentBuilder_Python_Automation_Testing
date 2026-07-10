@@ -1,0 +1,1 @@
+Chat history entry appeared after sending a message.

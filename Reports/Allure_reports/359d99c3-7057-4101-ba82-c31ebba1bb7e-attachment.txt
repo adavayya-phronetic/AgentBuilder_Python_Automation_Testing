@@ -1,0 +1,4 @@
+Agent: Three-Point Text Summarizer
+Card: Text Summarizer Orchestrator
+Provider: Bedrock
+Model: DeepSeek v3.2

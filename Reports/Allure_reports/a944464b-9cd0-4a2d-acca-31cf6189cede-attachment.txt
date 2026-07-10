@@ -1,0 +1,2 @@
+Testing agent 'Everyday Helper', card 'GeneralAssistantOrchestrator', provider 'Bedrock', model 'GLM 4.7 Flash'
+Set provider 'Bedrock' with model 'GLM 4.7 Flash', attached tools ['Convert_Language', 'Addition'] to 'GeneralAssistantOrchestrator', and redeployed agent 'Everyday Helper'.

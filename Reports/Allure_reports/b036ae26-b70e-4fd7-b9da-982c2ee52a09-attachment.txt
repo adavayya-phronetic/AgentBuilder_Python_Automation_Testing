@@ -1,0 +1,4 @@
+Agent: Tone Rewriter 20260709173457
+Card: Professional Text Rewriter
+Provider: Bedrock
+Model: Mistral Large 3

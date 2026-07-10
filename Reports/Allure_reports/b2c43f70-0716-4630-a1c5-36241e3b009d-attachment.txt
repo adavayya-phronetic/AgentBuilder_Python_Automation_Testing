@@ -1,0 +1,2 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Confirmed empty-instructions validation error for orchestrator agent of 'OCR Agent'.

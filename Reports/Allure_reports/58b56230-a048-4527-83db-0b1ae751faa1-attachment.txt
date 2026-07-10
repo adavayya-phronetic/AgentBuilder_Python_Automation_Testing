@@ -1,0 +1,4 @@
+Agent: Simple To-Do Creator
+Card: ToDoListAssistant
+Provider: Bedrock
+Model: google.gemma-3-4b-it

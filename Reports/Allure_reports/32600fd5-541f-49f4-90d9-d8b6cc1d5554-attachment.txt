@@ -1,0 +1,4 @@
+Agent: Section Organizer
+Card: Document Organizer Orchestrator
+Provider: Bedrock
+Model: Mistral Large 3

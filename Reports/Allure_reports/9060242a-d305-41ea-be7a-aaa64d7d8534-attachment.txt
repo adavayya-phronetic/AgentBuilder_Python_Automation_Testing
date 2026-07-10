@@ -1,0 +1,2 @@
+Testing agent 'Basic To-Do List Assistant', card 'ToDoListOrchestrator', provider 'Bedrock', model 'Qwen 3 32B'
+Set provider 'Bedrock' with model 'Qwen 3 32B', attached tools ['Convert_Language', 'Addition'] to 'ToDoListOrchestrator', and redeployed agent 'Basic To-Do List Assistant'.

@@ -1,0 +1,3 @@
+Confirmed empty-name validation error for orchestrator of 'Simple To-Do Assistant'.
+Confirmed non-alphanumeric name triggers inline error for orchestrator of 'Simple To-Do Assistant'.
+Confirmed original name restored cleanly for orchestrator of 'Simple To-Do Assistant' with no validation errors.

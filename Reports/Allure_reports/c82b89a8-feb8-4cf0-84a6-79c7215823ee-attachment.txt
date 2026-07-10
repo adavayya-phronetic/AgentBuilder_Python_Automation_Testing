@@ -1,0 +1,2 @@
+Testing agent '3-Point Summarizer', card 'Three Bullet Summery Agent', provider 'Bedrock', model 'mistral.ministral-3-3b-instruct'
+Set provider 'Bedrock' with model 'mistral.ministral-3-3b-instruct', attached tools ['Convert_Language', 'Addition'] to 'Three Bullet Summery Agent', and redeployed agent '3-Point Summarizer'.

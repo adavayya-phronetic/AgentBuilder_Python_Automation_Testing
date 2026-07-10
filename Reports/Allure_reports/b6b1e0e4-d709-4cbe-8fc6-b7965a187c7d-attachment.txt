@@ -1,0 +1,4 @@
+Agent: Triple Bullet Summarizer
+Card: Text Summarization Orchestrator
+Provider: Bedrock
+Model: mistral.ministral-3-8b-instruct

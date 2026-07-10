@@ -1,0 +1,2 @@
+Testing agent 'Everyday Helper', card 'GeneralAssistantOrchestrator', provider 'Bedrock', model 'openai.gpt-oss-20b-1:0'
+Set provider 'Bedrock' with model 'openai.gpt-oss-20b-1:0', attached tools ['Convert_Language', 'Addition'] to 'GeneralAssistantOrchestrator', and redeployed agent 'Everyday Helper'.

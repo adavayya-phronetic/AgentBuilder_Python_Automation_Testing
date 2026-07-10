@@ -1,0 +1,4 @@
+Agent: Simple To-Do Assistant
+Card: ToDoListOrchestrator
+Provider: Bedrock
+Model: GLM 4.7 Flash

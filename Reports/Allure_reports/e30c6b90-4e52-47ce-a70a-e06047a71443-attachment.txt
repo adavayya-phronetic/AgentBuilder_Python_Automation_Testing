@@ -1,0 +1,21 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Failed to capture test artifacts: Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7ff668123fa5+14925]
+	chromedriver!GetHandleVerifier [0x7ff668124000+14980]
+	chromedriver!(No symbol) [0x7ff667c67726]
+	chromedriver!(No symbol) [0x7ff667cb3083]
+	chromedriver!(No symbol) [0x7ff667cea2d2]
+	chromedriver!(No symbol) [0x7ff667ce40d2]
+	chromedriver!(No symbol) [0x7ff667ce3892]
+	chromedriver!(No symbol) [0x7ff667c303e5]
+	chromedriver!GetHandleVerifier [0x7ff668707591+5f7f11]
+	chromedriver!GetHandleVerifier [0x7ff668701902+5f2282]
+	chromedriver!GetHandleVerifier [0x7ff668727115+617a95]
+	chromedriver!GetHandleVerifier [0x7ff668141dce+3274e]
+	chromedriver!GetHandleVerifier [0x7ff66814a82c+3b1ac]
+	chromedriver!(No symbol) [0x7ff667c2f188]
+	chromedriver!GetHandleVerifier [0x7ff6688d7b58+7c84d8]
+	KERNEL32!BaseThreadInitThunk [0x7ffc1f10e957+17]
+	ntdll!RtlUserThreadStart [0x7ffc2064ad6c+2c]
+

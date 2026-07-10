@@ -1,0 +1,4 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Confirmed empty-instructions validation error for orchestrator of 'To-Do List Assistant'.
+Confirmed whitespace-only instructions are rejected for orchestrator of 'To-Do List Assistant'.
+Confirmed orchestrator of 'To-Do List Assistant' redeploys successfully once valid instructions are restored.

@@ -1,0 +1,3 @@
+Confirmed empty-name validation error for orchestrator of 'To-Do List Creator'.
+Confirmed non-alphanumeric name triggers inline error for orchestrator of 'To-Do List Creator'.
+Confirmed original name restored cleanly for orchestrator of 'To-Do List Creator' with no validation errors.

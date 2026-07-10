@@ -1,0 +1,2 @@
+Testing agent 'To-Do List Assistant', card 'SimpleToDoListAgent', provider 'Bedrock', model 'Qwen3 Coder 480B A35B Instruct'
+Set provider 'Bedrock' with model 'Qwen3 Coder 480B A35B Instruct', attached tools ['Convert_Language', 'Addition'] to 'SimpleToDoListAgent', and redeployed agent 'To-Do List Assistant'.

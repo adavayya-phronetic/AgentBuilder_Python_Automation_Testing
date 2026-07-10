@@ -1,0 +1,2 @@
+Testing agent 'Everyday Helper', card 'GeneralAssistantOrchestrator', provider 'Bedrock', model 'Claude Haiku 4.5'
+Set provider 'Bedrock' with model 'Claude Haiku 4.5', attached tools ['Convert_Language', 'Addition'] to 'GeneralAssistantOrchestrator', and redeployed agent 'Everyday Helper'.

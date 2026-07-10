@@ -1,0 +1,2 @@
+Testing agent 'Plain Language Explainer', card 'SimpleLanguageEducationAssistant', provider 'Bedrock', model 'moonshot.kimi-k2-thinking'
+Set provider 'Bedrock' with model 'moonshot.kimi-k2-thinking', attached tools ['Convert_Language', 'Addition'] to 'SimpleLanguageEducationAssistant', and redeployed agent 'Plain Language Explainer'.

@@ -1,0 +1,4 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Agent URL: https://agent-builder.phronetic.ai/build-agent/configure
+Generated agent name: Professional Email Drafter
+Agent created successfully: Professional Email Drafter

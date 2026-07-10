@@ -1,0 +1,2 @@
+Testing agent 'Triple Bullet Summarizer', card 'Text Summarization Orchestrator', provider 'Bedrock', model 'mistral.ministral-3-8b-instruct'
+Set provider 'Bedrock' with model 'mistral.ministral-3-8b-instruct', attached tools ['Convert_Language', 'Addition'] to 'Text Summarization Orchestrator', and redeployed agent 'Triple Bullet Summarizer'.

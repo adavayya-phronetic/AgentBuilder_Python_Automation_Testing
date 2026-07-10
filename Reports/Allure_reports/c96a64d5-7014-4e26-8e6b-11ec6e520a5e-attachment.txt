@@ -1,0 +1,4 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Confirmed empty-instructions validation error for orchestrator agent of 'AI Travel Agent'.
+Confirmed whitespace-only instructions are rejected for orchestrator agent of 'AI Travel Agent'.
+Confirmed orchestrator agent of 'AI Travel Agent' redeploys successfully once valid instructions are restored.

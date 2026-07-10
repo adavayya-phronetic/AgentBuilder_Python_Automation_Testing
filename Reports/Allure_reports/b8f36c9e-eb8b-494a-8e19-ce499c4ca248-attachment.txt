@@ -1,0 +1,2 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Testing agent 'Customer Support Chatbot Agent', card 'OrderStatusAgent', provider 'Bedrock', model 'moonshot.kimi-k2-thinking'

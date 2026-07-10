@@ -1,0 +1,4 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Confirmed empty-name validation error for orchestrator of 'AI Document OCR Agent'.
+Confirmed non-alphanumeric name triggers inline error for orchestrator of 'AI Document OCR Agent'.
+Confirmed original name restored cleanly for orchestrator of 'AI Document OCR Agent' with no validation errors.

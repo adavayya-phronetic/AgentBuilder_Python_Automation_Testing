@@ -1,0 +1,1 @@
+Confirmed closing the Instructions dialog without edits preserves content for orchestrator of 'AI Document OCR Agent'.

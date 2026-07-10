@@ -1,0 +1,3 @@
+Confirmed empty-name validation error for orchestrator of 'Triple Bullet Summarizer'.
+Confirmed non-alphanumeric name triggers inline error for orchestrator of 'Triple Bullet Summarizer'.
+Confirmed original name restored cleanly for orchestrator of 'Triple Bullet Summarizer' with no validation errors.

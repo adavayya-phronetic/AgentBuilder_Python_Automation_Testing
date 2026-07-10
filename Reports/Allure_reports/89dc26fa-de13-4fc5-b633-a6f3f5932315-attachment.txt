@@ -1,0 +1,4 @@
+Agent: Everyday Helper
+Card: GeneralAssistantOrchestrator
+Provider: Bedrock
+Model: Claude Haiku 4.5

@@ -1,0 +1,4 @@
+Agent: Everyday Helper
+Card: GeneralAssistantOrchestrator
+Provider: Bedrock
+Model: openai.gpt-oss-20b-1:0

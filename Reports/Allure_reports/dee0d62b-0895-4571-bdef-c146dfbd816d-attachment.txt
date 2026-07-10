@@ -1,0 +1,2 @@
+Testing agent 'Three-Point Text Summarizer', card 'Text Summarizer Orchestrator', provider 'Bedrock', model 'Claude Sonnet 4.5'
+Set provider 'Bedrock' with model 'Claude Sonnet 4.5', attached tools ['Convert_Language', 'Addition'] to 'Text Summarizer Orchestrator', and redeployed agent 'Three-Point Text Summarizer'.

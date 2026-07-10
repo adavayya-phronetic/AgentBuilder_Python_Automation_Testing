@@ -1,0 +1,4 @@
+Agent: DocSection Organizer
+Card: Document Organizer Orchestrator
+Provider: Bedrock
+Model: Qwen 3 32B

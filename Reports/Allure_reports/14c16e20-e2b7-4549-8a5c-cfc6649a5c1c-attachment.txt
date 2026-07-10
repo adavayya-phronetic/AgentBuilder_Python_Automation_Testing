@@ -1,0 +1,4 @@
+Agent: Three-Point Summarizer
+Card: InvalidName
+Provider: Bedrock
+Model: moonshot.kimi-k2-thinking

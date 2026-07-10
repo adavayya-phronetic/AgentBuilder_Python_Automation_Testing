@@ -1,0 +1,4 @@
+Agent: ProEmail Drafter
+Card: EmailDraftingOrchestrator
+Provider: Bedrock
+Model: qwen.qwen3-vl-235b-a22b

@@ -1,0 +1,5 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Step 1 OK: opened Chat for agent 'Email Drafter Assistant'.
+Step 2 OK: message sent and agent responded at https://chat.phronetic.ai/zK2yqbw9o8-fXBVx/chat/625fa15249924297aa2f63147ba59d2b
+Step 3 OK: new chat opened at https://chat.phronetic.ai/zK2yqbw9o8-fXBVx/chat?newchat=true
+Step 4 OK: 'sample_test.pdf' uploaded and agent responded with a summary.

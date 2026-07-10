@@ -1,0 +1,4 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Confirmed empty-instructions validation error for orchestrator agent of 'OCR Agent'.
+Confirmed whitespace-only instructions are rejected for orchestrator agent of 'OCR Agent'.
+Confirmed orchestrator agent of 'OCR Agent' redeploys successfully once valid instructions are restored.

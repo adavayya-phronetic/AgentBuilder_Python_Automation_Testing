@@ -1,0 +1,2 @@
+Testing agent 'Triple Bullet Summarizer', card 'Text Summarization Orchestrator', provider 'Bedrock', model 'moonshot.kimi-k2-thinking'
+Set provider 'Bedrock' with model 'moonshot.kimi-k2-thinking', attached tools ['Convert_Language', 'Addition'] to 'Text Summarization Orchestrator', and redeployed agent 'Triple Bullet Summarizer'.

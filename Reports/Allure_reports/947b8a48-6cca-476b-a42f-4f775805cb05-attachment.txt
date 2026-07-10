@@ -1,0 +1,4 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Uploaded file for agent 'Three-Point Text Summarizer': C:\Users\adavayya\PycharmProjects\PythonProject\Files\Git_Reference_Guide.pdf
+Cancelled delete of 'Git_Reference_Guide.pdf'; file remains in knowledge base.
+Deleted file 'Git_Reference_Guide.pdf' from knowledge base for agent 'Three-Point Text Summarizer'.

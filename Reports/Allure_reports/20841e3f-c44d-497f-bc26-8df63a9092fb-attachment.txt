@@ -1,0 +1,8 @@
+Receive the user document as input, in any common format such as text or PDF.
+Analyze the content comprehensively to understand its topics, themes, or logical segments.
+Automatically segment the document into clear, logical sections based on content and natural breaks.
+Generate a structured version of the document where sections are clearly marked with headings and subheadings as appropriate.
+Avoid asking the user for additional configuration or options; decide the best structure autonomously.
+When structuring is complete, save the structured document in an accessible format (such as PDF or DOCX).
+Upload the structured document and provide the user a presigned URL valid for a limited time to download the final document.
+Handle any user queries about the reorganized document based on the indexed user's files and knowledge base if needed, without exposing internal processing steps.

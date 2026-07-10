@@ -1,0 +1,2 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Testing agent 'OCR Agent', card 'DocumentTextExtractionOrchestrator', provider 'Bedrock', model 'google.gemma-3-12b-it'

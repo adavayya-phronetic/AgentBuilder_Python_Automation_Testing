@@ -1,0 +1,1 @@
+WARNING: Balance did not change after chatting (still ?61.79); may be a free interaction or a delayed update.

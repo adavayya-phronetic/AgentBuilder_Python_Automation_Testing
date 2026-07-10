@@ -1,0 +1,2 @@
+Testing agent 'To-Do List Assistant', card 'SimpleToDoListAgent', provider 'Bedrock', model 'moonshot.kimi-k2-thinking'
+Set provider 'Bedrock' with model 'moonshot.kimi-k2-thinking', attached tools ['Convert_Language', 'Addition'] to 'SimpleToDoListAgent', and redeployed agent 'To-Do List Assistant'.

@@ -1,36 +1,116 @@
-#Pytest fixture for test setup/teardown
-
 import os
 import subprocess
 import threading
+from datetime import datetime
+from urllib.parse import urlparse
+import allure
 import pytest
+from Webpages.landing_page import LandingPage
+from Webpages.login_page import LoginPage
 from Utility.drivers import get_driver
 from Utility import config
 
+
 @pytest.fixture(params=["chrome", "edge"])
 def driver(request):
+    """Function-scoped fresh browser — used by login/auth tests and test_create_agent."""
     browser_name = request.param
     driver_instance = get_driver(browser_name)
     driver_instance.get(config.url)
-
     yield driver_instance
+    # Captured here, before _quit_driver, rather than left to the
+    # _capture_screenshot autouse fixture: that fixture is function-scoped
+    # like this one, and pytest tears this fixture down first, so by the
+    # time _capture_screenshot ran the browser was already killed and every
+    # screenshot silently failed with a connection-refused error.
+    _capture_test_artifacts(driver_instance, request)
+    _quit_driver(driver_instance)
 
+
+@pytest.fixture(scope="session", params=["chrome", "edge"])
+def _session_browser(request):
+    """Session-scoped browser — one instance per browser type, shared across agent tests."""
+    browser_name = request.param
+    driver_instance = get_driver(browser_name)
+    driver_instance.get(config.url)
+    yield driver_instance
+    _quit_driver(driver_instance)
+
+
+@pytest.fixture(scope="session")
+def logged_in_driver(_session_browser):
+    """Logs in once per browser session; yields the driver positioned at the app dashboard."""
+    LandingPage(_session_browser).open_page()
+    LandingPage(_session_browser).click_get_started()
+    LoginPage(_session_browser).login(config.username, config.password)
+    yield _session_browser
+
+
+def _capture_test_artifacts(driver_instance, request):
+    """Takes a pass/fail screenshot (+ page source/URL on failure) for the given driver."""
+    rep_call = getattr(request.node, "rep_call", None)
+    if rep_call is None or driver_instance is None:
+        return
+
+    # Stamped onto every filename so repeated runs of the same test
+    # accumulate a new screenshot each time instead of overwriting the
+    # previous one.
+    timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+    test_name = f"{request.node.name}_{timestamp}"
     try:
-        rep_call = getattr(request.node, "rep_call", None)
-        if rep_call is not None:
-            test_name = request.node.name
-            if rep_call.failed:
-                os.makedirs("Screenshot/Failed", exist_ok=True)
-                driver_instance.save_screenshot(f"Screenshot/Failed/{test_name}.png")
-                with open(f"Screenshot/Failed/{test_name}.html", "w", encoding="utf-8") as f:
-                    f.write(driver_instance.page_source)
-            elif rep_call.passed:
-                os.makedirs("Screenshot/Passed", exist_ok=True)
-                driver_instance.save_screenshot(f"Screenshot/Passed/{test_name}.png")
+        screenshot = driver_instance.get_screenshot_as_png()
+        page_source = driver_instance.page_source
+        current_url = driver_instance.current_url
+
+        if rep_call.failed:
+            os.makedirs("Screenshot/Failed", exist_ok=True)
+            with open(f"Screenshot/Failed/{test_name}.png", "wb") as f:
+                f.write(screenshot)
+            with open(f"Screenshot/Failed/{test_name}.html", "w", encoding="utf-8") as f:
+                f.write(page_source)
+
+            allure.attach(screenshot, name="Screenshot on failure", attachment_type=allure.attachment_type.PNG)
+            allure.attach(page_source, name="Page source on failure", attachment_type=allure.attachment_type.HTML)
+            allure.attach(current_url, name="URL on failure", attachment_type=allure.attachment_type.TEXT)
+
+        elif rep_call.passed:
+            os.makedirs("Screenshot/Passed", exist_ok=True)
+            with open(f"Screenshot/Passed/{test_name}.png", "wb") as f:
+                f.write(screenshot)
+
+            allure.attach(screenshot, name="Screenshot on pass", attachment_type=allure.attachment_type.PNG)
+
     except Exception as e:
         print(f"Failed to capture test artifacts: {e}")
-    finally:
-        _quit_driver(driver_instance)
+
+
+@pytest.fixture(autouse=True)
+def _capture_screenshot_then_reset(request):
+    """After each test on the shared, session-scoped logged_in_driver: takes a pass/fail
+    screenshot of the state the test actually left behind, THEN hard-navigates to /agents so
+    the next test starts from a clean browser state. These two used to be separate autouse
+    fixtures (_capture_screenshot, _reset_to_agents_page); pytest doesn't guarantee same-scope
+    autouse fixtures tear down in declaration order, and in practice the reset was running
+    first, so every screenshot showed the generic /agents landing page instead of the test's
+    real final state. Combining them into one fixture makes the ordering explicit instead of
+    accidental. Tests using the function-scoped `driver` fixture are captured directly in that
+    fixture's own teardown instead — see the comment there for why."""
+    yield
+    if "driver" in request.node.funcargs:
+        return
+
+    driver = request.node.funcargs.get("logged_in_driver")
+    if driver is None:
+        return
+
+    _capture_test_artifacts(driver, request)
+
+    try:
+        parsed = urlparse(driver.current_url)
+        agents_url = f"{parsed.scheme}://{parsed.netloc}/agents"
+        driver.get(agents_url)
+    except Exception:
+        pass
 
 
 def _quit_driver(driver_instance, timeout=30):
@@ -66,10 +146,27 @@ def _quit_driver(driver_instance, timeout=30):
         try:
             subprocess.run(
                 ["taskkill", "/F", "/T", "/PID", str(pid)],
-                capture_output=True
+                capture_output=True,
+                timeout=15
             )
+        except subprocess.TimeoutExpired:
+            print(f"taskkill on driver process tree (pid {pid}) timed out after 15s; "
+                  f"leaving it to the OS rather than blocking the test run")
         except Exception as e:
             print(f"Failed to force kill driver process tree: {e}")
+
+
+_FILE_ORDER = ["test_login", "test_agent_creation", "test_agent_config", "test_validation"]
+
+
+def pytest_collection_modifyitems(items):
+    def file_rank(item):
+        name = item.fspath.basename
+        for i, prefix in enumerate(_FILE_ORDER):
+            if prefix in name:
+                return i
+        return len(_FILE_ORDER)
+    items.sort(key=file_rank)
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
@@ -88,8 +185,3 @@ def pytest_sessionfinish(session, exitstatus):
         )
     except Exception as e:
         print(f"Failed to generate Allure HTML report: {e}")
-
-
-
-#!request.param = current value from the params list
-#Each time, one value from the list is passed

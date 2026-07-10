@@ -1,0 +1,4 @@
+Agent: Plain Language Explainer
+Card: SimpleLanguageEducationAssistant
+Provider: Bedrock
+Model: moonshot.kimi-k2-thinking

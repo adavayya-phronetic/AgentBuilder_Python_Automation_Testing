@@ -1,0 +1,2 @@
+Testing agent 'Three-Point Summarizer', card 'InvalidName', provider 'Bedrock', model 'Claude Sonnet 4.5'
+Set provider 'Bedrock' with model 'Claude Sonnet 4.5', attached tools ['Convert_Language', 'Addition'] to 'InvalidName', and redeployed agent 'Three-Point Summarizer'.

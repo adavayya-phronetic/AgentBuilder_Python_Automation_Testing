@@ -1,0 +1,4 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Agent URL: https://agent-builder.phronetic.ai/build-agent/configure
+Generated agent name: Checklist Assistant
+Agent created successfully: Checklist Assistant

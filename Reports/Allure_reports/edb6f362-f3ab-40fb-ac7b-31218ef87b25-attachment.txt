@@ -1,0 +1,4 @@
+Agent: Basic To-Do List Assistant
+Card: ToDoListOrchestrator
+Provider: Bedrock
+Model: Qwen 3 32B

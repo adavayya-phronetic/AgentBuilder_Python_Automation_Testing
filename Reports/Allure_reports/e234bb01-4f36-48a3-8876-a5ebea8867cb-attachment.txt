@@ -1,0 +1,4 @@
+Agent: Daily Helper Assistant
+Card: EverydayAssistant
+Provider: Bedrock
+Model: mistral.ministral-3-3b-instruct

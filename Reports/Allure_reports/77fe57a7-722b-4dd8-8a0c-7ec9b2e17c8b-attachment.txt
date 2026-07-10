@@ -1,0 +1,2 @@
+Testing agent 'Doc Organizer', card 'Document Structuring Orchestrator', provider 'Bedrock', model 'Qwen3 Coder 480B A35B Instruct'
+Set provider 'Bedrock' with model 'Qwen3 Coder 480B A35B Instruct', attached tools ['Convert_Language', 'Addition'] to 'Document Structuring Orchestrator', and redeployed agent 'Doc Organizer'.

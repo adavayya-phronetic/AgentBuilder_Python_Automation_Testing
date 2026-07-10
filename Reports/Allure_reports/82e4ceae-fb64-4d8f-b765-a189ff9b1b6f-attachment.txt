@@ -1,0 +1,4 @@
+Agent: Simple To-Do Creator
+Card: ToDoListAssistant
+Provider: Bedrock
+Model: Claude Sonnet 4.5
