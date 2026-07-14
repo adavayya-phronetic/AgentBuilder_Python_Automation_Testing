@@ -1,0 +1,2 @@
+Testing agent 'Plain Language Explainer', card 'SimpleLanguageEducationAssistant', provider 'Bedrock', model 'openai.gpt-oss-20b-1:0'
+Set provider 'Bedrock' with model 'openai.gpt-oss-20b-1:0', attached tools ['Convert_Language', 'Addition'] to 'SimpleLanguageEducationAssistant', and redeployed agent 'Plain Language Explainer'.

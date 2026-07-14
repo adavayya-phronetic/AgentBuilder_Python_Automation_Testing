@@ -1,0 +1,3 @@
+Confirmed empty-name validation error for orchestrator of 'Simple ExplainBot'.
+Confirmed non-alphanumeric name triggers inline error for orchestrator of 'Simple ExplainBot'.
+Confirmed original name restored cleanly for orchestrator of 'Simple ExplainBot' with no validation errors.

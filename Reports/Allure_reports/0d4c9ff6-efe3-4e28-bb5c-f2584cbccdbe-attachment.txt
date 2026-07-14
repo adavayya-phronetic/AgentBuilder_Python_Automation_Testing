@@ -1,0 +1,3 @@
+Confirmed empty-name validation error for orchestrator of 'Checklist Assistant'.
+Confirmed non-alphanumeric name triggers inline error for orchestrator of 'Checklist Assistant'.
+Confirmed original name restored cleanly for orchestrator of 'Checklist Assistant' with no validation errors.

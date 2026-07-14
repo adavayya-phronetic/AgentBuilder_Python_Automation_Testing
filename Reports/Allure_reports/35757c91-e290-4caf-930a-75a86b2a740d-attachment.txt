@@ -1,0 +1,4 @@
+Agent: Plain Language Explainer
+Card: SimpleLanguageEducationAssistant
+Provider: Bedrock
+Model: openai.gpt-oss-20b-1:0

@@ -69,6 +69,27 @@ class AgentConfigurationPage:
             "//*[self::button or self::a][normalize-space()='EDITOR']"
         )
 
+        # --- Top-level agent name (EDITOR tab, Details panel) ---
+        # Distinct from orchestrator_name_input below: this is the agent's
+        # own name (avatar + name, shown at the top of Details), reached by
+        # clicking directly on the name text rather than opening a card.
+        self.agent_name_edit_trigger = (
+            By.XPATH,
+            "//div[@title='Click to edit']"
+        )
+
+        self.agent_name_input = (
+            By.XPATH,
+            "//input[contains(@class,'capitalize')]"
+        )
+
+        # Deliberately without "Orchestrator" — that's a different message
+        # for a different field (see name_empty_error below).
+        self.agent_name_empty_error = (
+            By.XPATH,
+            "//*[contains(text(),'Agent name cannot be empty')]"
+        )
+
         self.instructions_empty_error = (
             By.XPATH,
             "//*[contains(text(),'Orchestrator agent instructions cannot be empty')]"
@@ -146,6 +167,25 @@ class AgentConfigurationPage:
             "/ancestor::div[contains(@class,'group') and contains(@class,'relative')][1]"
         )
 
+        self.knowledge_base_heading = (
+            By.XPATH,
+            "//*[self::h2 or self::h3 or self::p or self::span][normalize-space()='Knowledge Base']"
+        )
+
+        # Both of these auto-dismiss after a few seconds (react-toastify),
+        # so callers must screenshot immediately after detecting them rather
+        # than doing further work first — see wait_for_upload_toast() /
+        # wait_for_delete_toast().
+        self.file_upload_toast = (
+            By.XPATH,
+            "//*[contains(text(),'File submitted for processing')]"
+        )
+
+        self.file_delete_toast = (
+            By.XPATH,
+            "//*[contains(text(),'File deleted successfully')]"
+        )
+
         self.graph_tab = (
             By.XPATH,
             "//*[self::button or self::a][normalize-space()='GRAPH']"
@@ -216,6 +256,13 @@ class AgentConfigurationPage:
         self.modal_overlay = (
             By.XPATH,
             "//div[@data-state='open' and contains(@class,'fixed') and contains(@class,'inset-0')]"
+        )
+
+        # Auto-dismisses after a few seconds like every other toast in this
+        # app — callers must screenshot immediately after detecting it.
+        self.redeploy_success_toast = (
+            By.XPATH,
+            "//*[contains(@class,'Toastify__toast--success') and contains(.,'Redeployed')]"
         )
 
         self.deploy_confirm_button = (
@@ -342,6 +389,30 @@ class AgentConfigurationPage:
         self.wait.until(
             EC.element_to_be_clickable(self.editor_tab)
         ).click()
+
+    @allure.step("Open the agent name edit field")
+    def click_agent_name_edit(self):
+        self.wait.until(
+            EC.element_to_be_clickable(self.agent_name_edit_trigger)
+        ).click()
+
+    @allure.step("Set the agent name to '{name}'")
+    def set_agent_name(self, name):
+        field = self.wait.until(
+            EC.element_to_be_clickable(self.agent_name_input)
+        )
+        field.send_keys(Keys.CONTROL, "a")
+        field.send_keys(Keys.DELETE)
+        if name:
+            field.send_keys(name)
+
+    def is_agent_name_empty_error_present(self, timeout=10):
+        try:
+            return WebDriverWait(self.driver, timeout).until(
+                EC.visibility_of_element_located(self.agent_name_empty_error)
+            ).is_displayed()
+        except TimeoutException:
+            return False
 
     def is_instructions_empty_error_present(self):
         try:
@@ -487,27 +558,54 @@ class AgentConfigurationPage:
             EC.element_to_be_clickable(self.output_type_video_button)
         ).click()
 
-    @allure.step("Upload '{file_path}' to knowledge base")
-    def upload_file(self, file_path):
+    @allure.step("Submit '{file_path}' for upload to knowledge base")
+    def submit_upload_file(self, file_path):
+        """Sends the file to the upload input and returns as soon as the request is
+        submitted, without waiting for it to finish processing.
+
+        Split out from upload_file() so a caller can screenshot the
+        "File submitted for processing" toast right as it appears (see
+        wait_for_upload_toast()) — it auto-dismisses after a few seconds, so
+        capturing it after the slower completion wait below would miss it.
+        """
         # Clicking the visible "Upload" button opens the native OS file
         # dialog, which Selenium cannot drive and would just sit there
         # blocking the browser. Skip the click and send the path straight
         # to the underlying <input type="file"> instead.
+
+        # The knowledge base panel scrolls internally, so scroll it into
+        # view *before* submitting — scrolling afterwards, once the toast is
+        # already showing, would happen too late to appear in a screenshot
+        # taken right when the toast fires.
+        self.scroll_knowledge_base_heading_into_view()
+
         file_input = self.wait.until(
             EC.presence_of_element_located(self.knowledge_base_file_input)
         )
 
         pending_count_before = len(self.driver.find_elements(*self.pending_upload_status))
-
         file_input.send_keys(file_path)
+        return pending_count_before
 
+    def wait_for_upload_toast(self, timeout=10):
+        """Waits for the 'File submitted for processing' toast. Auto-dismisses after
+        a few seconds — callers should screenshot immediately after this returns."""
+        try:
+            WebDriverWait(self.driver, timeout).until(
+                EC.visibility_of_element_located(self.file_upload_toast)
+            )
+        except TimeoutException:
+            pass
+
+    @allure.step("Wait for '{file_path}' upload to complete")
+    def wait_for_upload_completion(self, file_path, pending_count_before, timeout=60):
         # The new row briefly shows "Pending" before flipping to "Completed".
         # Wait for both transitions so the upload is actually visible on
         # screen instead of the test racing past it.
         WebDriverWait(self.driver, 15).until(
             lambda d: len(d.find_elements(*self.pending_upload_status)) > pending_count_before
         )
-        WebDriverWait(self.driver, 60).until(
+        WebDriverWait(self.driver, timeout).until(
             lambda d: len(d.find_elements(*self.pending_upload_status)) <= pending_count_before
         )
 
@@ -516,13 +614,35 @@ class AgentConfigurationPage:
         # succeeded. Scroll it into view so it's actually visible on screen.
         self._scroll_knowledge_base_row_into_view(os.path.basename(file_path))
 
-    def _scroll_knowledge_base_row_into_view(self, file_name, index=0):
+    @allure.step("Upload '{file_path}' to knowledge base")
+    def upload_file(self, file_path):
+        pending_count_before = self.submit_upload_file(file_path)
+        self.wait_for_upload_completion(file_path, pending_count_before)
+
+    def get_knowledge_base_row(self, file_name, index=0, timeout=5):
+        """Returns the WebElement for the given knowledge base row, or None if it
+        isn't present (e.g. called right after the row was deleted)."""
         row_xpath = f"({self.knowledge_base_row_xpath.format(file_name=file_name)})[{index + 1}]"
         try:
-            row = WebDriverWait(self.driver, 5).until(
+            return WebDriverWait(self.driver, timeout).until(
                 EC.presence_of_element_located((By.XPATH, row_xpath))
             )
+        except TimeoutException:
+            return None
+
+    def _scroll_knowledge_base_row_into_view(self, file_name, index=0):
+        row = self.get_knowledge_base_row(file_name, index, timeout=5)
+        if row is not None:
             self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", row)
+
+    def scroll_knowledge_base_heading_into_view(self):
+        """Scrolls the Knowledge Base panel itself into view. Used after a delete,
+        when the row that would otherwise anchor the scroll no longer exists."""
+        try:
+            heading = WebDriverWait(self.driver, 5).until(
+                EC.presence_of_element_located(self.knowledge_base_heading)
+            )
+            self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", heading)
         except TimeoutException:
             pass
 
@@ -552,6 +672,16 @@ class AgentConfigurationPage:
         WebDriverWait(self.driver, 15).until(
             lambda d: self.count_knowledge_base_files(file_name) < before_count
         )
+
+    def wait_for_delete_toast(self, timeout=10):
+        """Waits for the 'File deleted successfully' toast. Auto-dismisses after a
+        few seconds — callers should screenshot immediately after this returns."""
+        try:
+            WebDriverWait(self.driver, timeout).until(
+                EC.visibility_of_element_located(self.file_delete_toast)
+            )
+        except TimeoutException:
+            pass
 
     @allure.step("Cancel delete of '{file_name}' from knowledge base")
     def cancel_delete_knowledge_base_file(self, file_name, index=0):
@@ -791,6 +921,17 @@ class AgentConfigurationPage:
             )
         except TimeoutException:
             pass
+
+    def is_redeploy_success_toast_present(self, timeout=10):
+        """Waits for the 'Agent Redeployed Successfully!' toast. Auto-dismisses
+        after a few seconds — callers should screenshot immediately after this
+        returns True."""
+        try:
+            return WebDriverWait(self.driver, timeout).until(
+                EC.visibility_of_element_located(self.redeploy_success_toast)
+            ).is_displayed()
+        except TimeoutException:
+            return False
 
     @allure.step("Redeploy if available (skip if only Publish is offered)")
     def try_redeploy(self, timeout=5):

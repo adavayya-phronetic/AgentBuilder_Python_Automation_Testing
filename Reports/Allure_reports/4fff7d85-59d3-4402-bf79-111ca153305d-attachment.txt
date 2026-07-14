@@ -1,0 +1,4 @@
+Agent: Checklist Creator
+Card: Checklist Creator Orchestrator
+Provider: Bedrock
+Model: openai.gpt-oss-20b-1:0

@@ -1,0 +1,4 @@
+Agent: Title Generator Assistant
+Card: Document Title Generator Orchestrator
+Provider: Bedrock
+Model: mistral.ministral-3-3b-instruct

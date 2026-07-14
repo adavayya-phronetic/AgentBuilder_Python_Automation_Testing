@@ -1,0 +1,4 @@
+Agent: Checklist Creator
+Card: Checklist Creator Orchestrator
+Provider: Bedrock
+Model: Qwen3 Coder 30B A3B Instruct

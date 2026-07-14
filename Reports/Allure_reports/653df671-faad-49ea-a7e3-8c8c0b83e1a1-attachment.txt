@@ -1,0 +1,2 @@
+Confirmed: redeployment blocked with model validation error for 'Checklist Assistant'.
+Restored original provider 'Bedrock' and model for 'Checklist Assistant'.

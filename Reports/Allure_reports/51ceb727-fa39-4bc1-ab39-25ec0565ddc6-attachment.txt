@@ -1,0 +1,4 @@
+Confirmed empty-name validation error for agent 'Simple Explainer Assistant'.
+Confirmed whitespace-only agent name is rejected for 'Simple Explainer Assistant'.
+Confirmed non-alphanumeric name triggers inline error for agent 'Simple Explainer Assistant'.
+Confirmed agent 'Simple Explainer Assistant' name restored cleanly with no validation errors.

@@ -1,0 +1,4 @@
+Agent: Checklist Creator
+Card: Checklist Creator Orchestrator
+Provider: Bedrock
+Model: Claude 3 Haiku

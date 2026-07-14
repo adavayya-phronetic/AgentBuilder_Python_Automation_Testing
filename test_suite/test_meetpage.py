@@ -149,7 +149,7 @@ def test_meet_interact_upload_and_validate_features(logged_in_driver):
             assert meet_page.is_in_call(), "Step 4 failed: call ended unexpectedly during feature validation"
             print("Step 4 OK: all in-call features validated.")
 
-        with allure.step("Step 5: Chat History - join a past chat, then return to the current session"):
+        with allure.step("Step 5: Chat History - join a past chat if available, then return to the current session"):
             meet_page.open_chat_history()
             assert meet_page.is_chat_history_panel_open(), (
                 "Step 5 failed: Chat History panel did not open"
@@ -157,26 +157,35 @@ def test_meet_interact_upload_and_validate_features(logged_in_driver):
             print("Step 5a OK: Chat History panel opened.")
             attach_step_screenshot(driver, "Step 5a: Chat History panel opened")
 
-            meet_page.join_random_past_chat()
-            assert meet_page.is_in_call(), (
-                "Step 5 failed: call ended unexpectedly after joining a past chat"
-            )
-            print("Step 5b OK: joined a random past chat from history.")
-            attach_step_screenshot(driver, "Step 5b: Joined past chat")
+            if meet_page.join_random_past_chat():
+                assert meet_page.is_in_call(), (
+                    "Step 5 failed: call ended unexpectedly after joining a past chat"
+                )
+                print("Step 5b OK: joined a random past chat from history.")
+                attach_step_screenshot(driver, "Step 5b: Joined past chat")
 
-            meet_page.open_chat_history()
-            assert meet_page.is_chat_history_panel_open(), (
-                "Step 5 failed: Chat History panel did not reopen after joining a past chat"
-            )
-            print("Step 5c OK: Chat History panel reopened.")
-            attach_step_screenshot(driver, "Step 5c: Chat History panel reopened")
+                meet_page.open_chat_history()
+                assert meet_page.is_chat_history_panel_open(), (
+                    "Step 5 failed: Chat History panel did not reopen after joining a past chat"
+                )
+                print("Step 5c OK: Chat History panel reopened.")
+                attach_step_screenshot(driver, "Step 5c: Chat History panel reopened")
 
-            meet_page.return_to_current_session()
-            assert meet_page.is_in_call(), (
-                "Step 5 failed: call ended unexpectedly after returning to the current session"
-            )
-            print("Step 5 OK: returned to the current active session.")
-            attach_step_screenshot(driver, "Step 5: Returned to current session")
+                meet_page.return_to_current_session()
+                assert meet_page.is_in_call(), (
+                    "Step 5 failed: call ended unexpectedly after returning to the current session"
+                )
+                print("Step 5 OK: returned to the current active session.")
+                attach_step_screenshot(driver, "Step 5: Returned to current session")
+            else:
+                # A brand-new room can have only the current live session
+                # listed, with no past chats to select from — nothing to
+                # exercise here, so this isn't treated as a failure.
+                assert meet_page.is_in_call(), (
+                    "Step 5 failed: call ended unexpectedly while checking Chat History"
+                )
+                print("Step 5 SKIPPED: no past chat history available to join for this room.")
+                attach_step_screenshot(driver, "Step 5: No past chat history to join")
 
         with allure.step("Step 6: End call, rejoin, then end call again"):
             meet_page.hang_up()

@@ -1,0 +1,3 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Agent URL: https://agent-builder.phronetic.ai/build-agent/configure
+WARNING: Agent creation hit a duplicate-name collision (Agent with this name already exists); this is a naming coincidence, not treated as a failure.

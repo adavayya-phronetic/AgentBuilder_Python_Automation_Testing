@@ -1,0 +1,3 @@
+Confirmed empty-name validation error for orchestrator of 'Plain Language Explainer'.
+Confirmed non-alphanumeric name triggers inline error for orchestrator of 'Plain Language Explainer'.
+Confirmed original name restored cleanly for orchestrator of 'Plain Language Explainer' with no validation errors.

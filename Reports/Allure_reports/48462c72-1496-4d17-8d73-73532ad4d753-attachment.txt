@@ -1,0 +1,4 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Testing agent 'Plain Language Explainer', card 'SimpleLanguageEducationAssistant', provider 'Bedrock', model 'openai.gpt-oss-20b-1:0'
+Confirmed 'Agent Redeployed Successfully!' toast shown for 'Plain Language Explainer'.
+Set provider 'Bedrock' with model 'openai.gpt-oss-20b-1:0', attached tools ['Convert_Language', 'Addition'] to 'SimpleLanguageEducationAssistant', and redeployed agent 'Plain Language Explainer'.

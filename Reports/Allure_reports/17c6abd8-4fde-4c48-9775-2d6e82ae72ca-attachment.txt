@@ -1,0 +1,4 @@
+Agent: SimpleEd Explainer
+Card: SimpleEduAssistant
+Provider: Bedrock
+Model: DeepSeek v3.2

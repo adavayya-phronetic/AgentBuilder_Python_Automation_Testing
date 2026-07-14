@@ -1,0 +1,3 @@
+Confirmed empty-name validation error for orchestrator of 'Simple Explainer Assistant'.
+Confirmed non-alphanumeric name triggers inline error for orchestrator of 'Simple Explainer Assistant'.
+Confirmed original name restored cleanly for orchestrator of 'Simple Explainer Assistant' with no validation errors.

@@ -4,7 +4,7 @@ import allure
 import pytest
 from Webpages.my_agent_page import MyAgentsPage
 from Webpages.agent_configuration_page import AgentConfigurationPage
-from Utility.allure_helpers import attach_step_screenshot
+from Utility.allure_helpers import attach_step_screenshot, attach_and_save_screenshot
 
 
 @allure.feature("Agent Validation")
@@ -12,7 +12,7 @@ from Utility.allure_helpers import attach_step_screenshot
 @allure.title("Empty and whitespace-only orchestrator instructions are rejected; valid instructions succeed")
 @allure.severity(allure.severity_level.CRITICAL)
 @pytest.mark.agent_validation
-def test_orchestrator_empty_instructions_validation(logged_in_driver):
+def test_orchestrator_empty_instructions_validation(logged_in_driver, request):
 
     driver = logged_in_driver
 
@@ -48,7 +48,9 @@ def test_orchestrator_empty_instructions_validation(logged_in_driver):
             f"after clearing instructions and redeploying orchestrator for '{target_agent_name}'"
         )
         print(f"Confirmed empty-instructions validation error for orchestrator of '{target_agent_name}'.")
-        attach_step_screenshot(driver, "Case 1: empty instructions error shown")
+        # Saved as its own file since Case 2/Recovery below leave the plain
+        # Screenshot/Passed capture showing a later, different state.
+        attach_and_save_screenshot(driver, request, "Case 1: empty instructions error shown")
 
         config_page.close_error_toast()
         # The side panel closes once the toast clears, so the orchestrator card
@@ -70,7 +72,9 @@ def test_orchestrator_empty_instructions_validation(logged_in_driver):
             f"after saving whitespace-only instructions for orchestrator of '{target_agent_name}'"
         )
         print(f"Confirmed whitespace-only instructions are rejected for orchestrator of '{target_agent_name}'.")
-        attach_step_screenshot(driver, "Case 2: whitespace-only instructions error shown")
+        # Saved as its own file since Recovery below leaves the plain
+        # Screenshot/Passed capture showing the later, successful state.
+        attach_and_save_screenshot(driver, request, "Case 2: whitespace-only instructions error shown")
 
         config_page.close_error_toast()
         config_page.open_orchestrator_card()
@@ -304,11 +308,108 @@ def test_orchestrator_name_validation(logged_in_driver):
 
 
 @allure.feature("Agent Validation")
+@allure.story("Name Validation")
+@allure.title("Empty, whitespace-only, and non-alphanumeric agent names are rejected; original name restores cleanly")
+@allure.severity(allure.severity_level.CRITICAL)
+@pytest.mark.agent_validation
+def test_agent_name_validation(logged_in_driver, request):
+    """
+    Validates the top-level agent name field in the EDITOR tab's Details
+    panel — distinct from the orchestrator card's own name field covered by
+    test_orchestrator_name_validation above.
+    """
+    driver = logged_in_driver
+
+    with allure.step("Select a random active agent and open its EDITOR tab"):
+        agents_page = MyAgentsPage(driver)
+        agents_page.click_my_agents()
+
+        active_agent_names = agents_page.get_active_agent_names()
+        assert active_agent_names, "No active agents found in the agent card list"
+
+        target_agent_name = random.choice(active_agent_names)
+        allure.attach(target_agent_name, name="Target agent", attachment_type=allure.attachment_type.TEXT)
+
+        agents_page.search_agent(target_agent_name)
+        agents_page.click_agent_card(target_agent_name)
+
+        config_page = AgentConfigurationPage(driver)
+        config_page.click_editor_tab()
+        attach_step_screenshot(driver, "Editor tab opened")
+
+    with allure.step("Case 1 — Empty agent name is rejected on redeploy"):
+        # Save opens a dropdown; clicking Redeploy from it triggers server-side
+        # validation. With an empty name the server blocks the action and
+        # returns a validation toast — nothing is actually deployed.
+        config_page.click_agent_name_edit()
+        config_page.set_agent_name("")
+        config_page.click_save()
+        config_page.click_redeploy()
+
+        assert config_page.is_agent_name_empty_error_present(), (
+            "Expected 'Agent name cannot be empty' error after clearing the "
+            f"agent name for '{target_agent_name}'"
+        )
+        print(f"Confirmed empty-name validation error for agent '{target_agent_name}'.")
+        attach_and_save_screenshot(driver, request, "Case 1 - empty name error")
+
+        config_page.close_error_toast()
+
+    with allure.step("Case 2 — Whitespace-only agent name is rejected on redeploy"):
+        # Whitespace carries no real content, so the same validation should
+        # reject it rather than treating it as a non-empty name.
+        config_page.click_agent_name_edit()
+        config_page.set_agent_name("   ")
+        config_page.click_save()
+        config_page.click_redeploy()
+
+        assert config_page.is_agent_name_empty_error_present(), (
+            "Expected 'Agent name cannot be empty' error after setting a "
+            f"whitespace-only agent name for '{target_agent_name}'"
+        )
+        print(f"Confirmed whitespace-only agent name is rejected for '{target_agent_name}'.")
+        attach_and_save_screenshot(driver, request, "Case 2 - whitespace name error")
+
+        config_page.close_error_toast()
+
+    with allure.step("Case 3 — Non-alphanumeric agent name triggers inline validation error"):
+        # The inline validator fires on input; the error is visible without
+        # needing to attempt a save.
+        config_page.click_agent_name_edit()
+        config_page.set_agent_name("Invalid@Name!")
+
+        assert config_page.is_name_alphanumeric_error_present(), (
+            "Expected 'Name can only contain alphanumeric characters.' inline error "
+            f"after entering a name with special characters for '{target_agent_name}'"
+        )
+        print(f"Confirmed non-alphanumeric name triggers inline error for agent '{target_agent_name}'.")
+        attach_and_save_screenshot(driver, request, "Case 3 - alphanumeric name error")
+
+    with allure.step(f"Restore original name '{target_agent_name}' and verify no validation errors"):
+        config_page.set_agent_name(target_agent_name)
+        config_page.click_save()
+
+        # Restoring the name to its original, already-deployed value means
+        # there's nothing actually different to redeploy, so Redeploy stays
+        # disabled here — unlike Cases 1/2 above, which set a genuinely
+        # different (invalid) value. try_redeploy() clicks it if available
+        # and otherwise dismisses the dropdown instead of forcing a click on
+        # a disabled button.
+        config_page.try_redeploy()
+
+        assert not config_page.is_agent_name_empty_error_present(timeout=5), (
+            f"Empty-name error still present after restoring the original name for '{target_agent_name}'"
+        )
+        print(f"Confirmed agent '{target_agent_name}' name restored cleanly with no validation errors.")
+        attach_step_screenshot(driver, "Original name restored and redeployed")
+
+
+@allure.feature("Agent Validation")
 @allure.story("Model Validation")
 @allure.title("Redeployment is blocked with a validation error when the Model field is empty")
 @allure.severity(allure.severity_level.CRITICAL)
 @pytest.mark.agent_validation
-def test_model_field_required_on_redeploy(logged_in_driver):
+def test_model_field_required_on_redeploy(logged_in_driver, request):
     """
     Bug: Switching the Model Provider clears the Model field, but clicking Redeploy
     still proceeds and deploys the agent without a model selected.
@@ -392,7 +493,10 @@ def test_model_field_required_on_redeploy(logged_in_driver):
             f"'{target_name}', but no model-related error toast was shown."
         )
         print(f"Confirmed: redeployment blocked with model validation error for '{target_name}'.")
-        attach_step_screenshot(driver, "Model required error shown")
+        # Saved as its own file (not just an Allure step attachment) since
+        # the recovery step below leaves the plain Screenshot/Passed capture
+        # showing the restored, error-free state instead of this one.
+        attach_and_save_screenshot(driver, request, "Model required error shown")
 
     with allure.step("Restore original model provider and model"):
         config_page.close_error_toast()

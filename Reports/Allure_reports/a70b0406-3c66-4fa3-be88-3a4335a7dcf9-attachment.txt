@@ -1,0 +1,2 @@
+Current URL: https://auth.phronetic.ai/login?client_id=agent-builder&redirect_uri=https%3A%2F%2Fagent-builder.phronetic.ai%2Fauth%2Fcallback&code_challenge=vm4uR9ulG0ZKjHP60pZD9xbuds2QxhQ6hGL92eb8M7k
+Invalid login error message: Incorrect email or password

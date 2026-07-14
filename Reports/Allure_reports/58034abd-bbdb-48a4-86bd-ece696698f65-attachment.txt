@@ -1,0 +1,4 @@
+Agent: Simple Education Explainer
+Card: SimpleEducationAssistant
+Provider: Bedrock
+Model: openai.gpt-oss-120b-1:0

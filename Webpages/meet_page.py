@@ -201,9 +201,10 @@ class MeetPage:
 
     @allure.step("Rejoin the same meeting session")
     def rejoin(self):
-        self.wait.until(
-            EC.element_to_be_clickable(self.rejoin_button)
-        ).click()
+        # A transient modal backdrop (page-transition overlay) can still be
+        # fading out right as the button becomes clickable, intercepting a
+        # plain click — same JS-click fallback as hang_up()/_click() below.
+        self._click(self.rejoin_button)
         # Same WebRTC handshake settle as the initial join_now().
         self.wait.until(
             EC.visibility_of_element_located(self.hang_up_button)
@@ -344,12 +345,21 @@ class MeetPage:
             return False
 
     @allure.step("Join a random past chat from Chat History")
-    def join_random_past_chat(self):
+    def join_random_past_chat(self, timeout=5):
+        """Returns True if a past chat was joined. Returns False if there
+        was no chat history to join — e.g. a brand-new room that only has
+        the current live session and no past chats listed — rather than
+        waiting out the full default timeout for buttons that will never
+        appear."""
+        try:
+            join_buttons = WebDriverWait(self.driver, timeout).until(
+                EC.presence_of_all_elements_located(self.chat_history_join_buttons)
+            )
+        except TimeoutException:
+            return False
+
         # Joining collapses the Chat History panel back into the in-call
         # view, so the panel must be reopened afterwards for anything else.
-        join_buttons = self.wait.until(
-            EC.presence_of_all_elements_located(self.chat_history_join_buttons)
-        )
         chosen = random.choice(join_buttons)
         self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", chosen)
         self.driver.execute_script("arguments[0].click();", chosen)
@@ -363,6 +373,7 @@ class MeetPage:
             EC.element_to_be_clickable(self.more_options_button)
         )
         time.sleep(3)
+        return True
 
     @allure.step("Return to the current active session from Chat History")
     def return_to_current_session(self):

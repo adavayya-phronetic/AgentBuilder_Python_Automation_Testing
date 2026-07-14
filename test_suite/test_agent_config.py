@@ -6,22 +6,17 @@ import allure
 import pytest
 from Webpages.my_agent_page import MyAgentsPage
 from Webpages.agent_configuration_page import AgentConfigurationPage
-from Utility.allure_helpers import attach_step_screenshot
+from Utility.allure_helpers import attach_step_screenshot, attach_scrolled_screenshot, attach_and_save_screenshot
 
 
 @allure.feature("Agent Configuration")
-@allure.story("Knowledge Base")
-@allure.title("Configure I/O types and upload, cancel-delete, then delete a knowledge base file")
+@allure.story("I/O Types")
+@allure.title("Configure audio and video I/O types on the EDITOR tab")
 @allure.severity(allure.severity_level.NORMAL)
 @pytest.mark.knowledge_base
-def test_configure_agent_io_and_upload(logged_in_driver):
+def test_configure_agent_io_types(logged_in_driver):
 
     driver = logged_in_driver
-
-    upload_file_path = os.path.abspath(
-        os.path.join("Files", "Git_Reference_Guide.pdf")
-    )
-    file_name = os.path.basename(upload_file_path)
 
     with allure.step("Select a random active agent"):
         agents_page = MyAgentsPage(driver)
@@ -45,15 +40,103 @@ def test_configure_agent_io_and_upload(logged_in_driver):
         config_page.select_output_type_video()
         attach_step_screenshot(driver, "Audio/video I/O configured")
 
+
+@allure.feature("Agent Configuration")
+@allure.story("Knowledge Base")
+@allure.title("Upload a file to the knowledge base")
+@allure.severity(allure.severity_level.NORMAL)
+@pytest.mark.knowledge_base
+@pytest.mark.knowledge_base_upload
+def test_upload_knowledge_base_file(logged_in_driver):
+
+    driver = logged_in_driver
+
+    upload_file_path = os.path.abspath(
+        os.path.join("Files", "Git_Reference_Guide.pdf")
+    )
+    file_name = os.path.basename(upload_file_path)
+
+    with allure.step("Select a random active agent"):
+        agents_page = MyAgentsPage(driver)
+        agents_page.click_my_agents()
+
+        active_agent_names = agents_page.get_active_agent_names()
+        assert active_agent_names, "No active agents found in the agent card list"
+
+        target_agent_name = random.choice(active_agent_names)
+        allure.attach(target_agent_name, name="Target agent", attachment_type=allure.attachment_type.TEXT)
+
+        agents_page.search_agent(target_agent_name)
+        agents_page.click_agent_card(target_agent_name)
+        attach_step_screenshot(driver, "Agent selected")
+
+    with allure.step("Open the EDITOR tab"):
+        config_page = AgentConfigurationPage(driver)
+        config_page.click_editor_tab()
+
     with allure.step(f"Upload '{file_name}' to the knowledge base"):
+        count_before_upload = config_page.count_knowledge_base_files(file_name)
+        pending_count_before = config_page.submit_upload_file(upload_file_path)
+
+        # The "File submitted for processing" toast auto-dismisses after a
+        # few seconds, so it's captured here, right as it appears, instead
+        # of after the (slower) wait for the upload to finish below.
+        config_page.wait_for_upload_toast()
+        attach_step_screenshot(driver, "File uploaded to knowledge base")
+
+        config_page.wait_for_upload_completion(upload_file_path, pending_count_before)
+
+        assert config_page.count_knowledge_base_files(file_name) > count_before_upload, (
+            f"'{file_name}' did not appear in the knowledge base after upload"
+        )
+        print(f"Uploaded file for agent '{target_agent_name}':", upload_file_path)
+
+        # The uploaded row can land below the fold of the internally
+        # scrolling knowledge base panel, so scroll it into view (only if
+        # it actually needs it) before capturing the completed-state screenshot.
+        uploaded_row = config_page.get_knowledge_base_row(file_name)
+        attach_scrolled_screenshot(driver, uploaded_row, "Upload completed")
+
+
+@allure.feature("Agent Configuration")
+@allure.story("Knowledge Base")
+@allure.title("Cancel a delete, then delete a file from the knowledge base")
+@allure.severity(allure.severity_level.NORMAL)
+@pytest.mark.knowledge_base
+@pytest.mark.knowledge_base_delete
+def test_delete_knowledge_base_file(logged_in_driver):
+
+    driver = logged_in_driver
+
+    upload_file_path = os.path.abspath(
+        os.path.join("Files", "Git_Reference_Guide.pdf")
+    )
+    file_name = os.path.basename(upload_file_path)
+
+    with allure.step("Select a random active agent"):
+        agents_page = MyAgentsPage(driver)
+        agents_page.click_my_agents()
+
+        active_agent_names = agents_page.get_active_agent_names()
+        assert active_agent_names, "No active agents found in the agent card list"
+
+        target_agent_name = random.choice(active_agent_names)
+        allure.attach(target_agent_name, name="Target agent", attachment_type=allure.attachment_type.TEXT)
+
+        agents_page.search_agent(target_agent_name)
+        agents_page.click_agent_card(target_agent_name)
+        attach_step_screenshot(driver, "Agent selected")
+
+    with allure.step(f"Open the EDITOR tab and upload '{file_name}' to have something to delete"):
+        config_page = AgentConfigurationPage(driver)
+        config_page.click_editor_tab()
+
         count_before_upload = config_page.count_knowledge_base_files(file_name)
         config_page.upload_file(upload_file_path)
 
         assert config_page.count_knowledge_base_files(file_name) > count_before_upload, (
             f"'{file_name}' did not appear in the knowledge base after upload"
         )
-        print(f"Uploaded file for agent '{target_agent_name}':", upload_file_path)
-        attach_step_screenshot(driver, "File uploaded to knowledge base")
 
     with allure.step(f"Cancel deletion of '{file_name}' — file must remain"):
         count_before_delete = config_page.count_knowledge_base_files(file_name)
@@ -63,16 +146,23 @@ def test_configure_agent_io_and_upload(logged_in_driver):
             f"'{file_name}' was removed even though delete was cancelled"
         )
         print(f"Cancelled delete of '{file_name}'; file remains in knowledge base.")
-        attach_step_screenshot(driver, "Deletion cancelled, file remains")
+
+        remaining_row = config_page.get_knowledge_base_row(file_name)
+        attach_scrolled_screenshot(driver, remaining_row, "Deletion cancelled, file remains")
 
     with allure.step(f"Delete '{file_name}' from the knowledge base"):
         config_page.delete_knowledge_base_file(file_name)
+
+        # The "File deleted successfully" toast auto-dismisses after a few
+        # seconds, so it's captured here, right as it appears, rather than
+        # after the assertions/prints below.
+        config_page.wait_for_delete_toast()
+        attach_step_screenshot(driver, "File deleted from knowledge base")
 
         assert config_page.count_knowledge_base_files(file_name) == count_before_upload, (
             f"'{file_name}' was not removed from the knowledge base after delete"
         )
         print(f"Deleted file '{file_name}' from knowledge base for agent '{target_agent_name}'.")
-        attach_step_screenshot(driver, "File deleted from knowledge base")
 
 
 @allure.feature("Agent Configuration")
@@ -80,7 +170,7 @@ def test_configure_agent_io_and_upload(logged_in_driver):
 @allure.title("Attach tools to orchestrator, redeploy, and verify persistence after navigating away")
 @allure.severity(allure.severity_level.CRITICAL)
 @pytest.mark.tool_attachment
-def test_attach_tool_to_orchestrator(logged_in_driver):
+def test_attach_tool_to_orchestrator(logged_in_driver, request):
 
     driver = logged_in_driver
 
@@ -136,7 +226,15 @@ def test_attach_tool_to_orchestrator(logged_in_driver):
     with allure.step("Save and redeploy the agent"):
         config_page.click_save()
         config_page.click_redeploy()
-        attach_step_screenshot(driver, "Saved and redeployed")
+
+        assert config_page.is_redeploy_success_toast_present(), (
+            f"Expected 'Agent Redeployed Successfully!' toast after redeploying '{target_agent_name}'"
+        )
+        print(f"Confirmed 'Agent Redeployed Successfully!' toast shown for '{target_agent_name}'.")
+        # Saved as its own file (not just an Allure step attachment) since
+        # the "navigate away and back" step below leaves the plain
+        # Screenshot/Passed capture showing a different, later state.
+        attach_and_save_screenshot(driver, request, "Agent redeployed successfully")
 
     with allure.step("Navigate away and back to confirm tools persisted on the backend"):
         # A hard reload drops the session so we navigate in-app instead.

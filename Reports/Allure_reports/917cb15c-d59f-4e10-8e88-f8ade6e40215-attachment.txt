@@ -1,0 +1,4 @@
+Agent: SimpleEd Explainer
+Card: SimpleEduAssistant
+Provider: Bedrock
+Model: Claude Sonnet 4.6

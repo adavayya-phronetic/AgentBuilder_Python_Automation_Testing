@@ -1,0 +1,23 @@
+Failed to capture test artifacts: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=149.0.7827.201)
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7ff694893fa5+14925]
+	chromedriver!GetHandleVerifier [0x7ff694894000+14980]
+	chromedriver!(No symbol) [0x7ff6943d793d]
+	chromedriver!(No symbol) [0x7ff6943ae362]
+	chromedriver!(No symbol) [0x7ff694461846]
+	chromedriver!(No symbol) [0x7ff69447ec82]
+	chromedriver!(No symbol) [0x7ff69442401c]
+	chromedriver!(No symbol) [0x7ff694424f43]
+	chromedriver!GetHandleVerifier [0x7ff694e77591+5f7f11]
+	chromedriver!GetHandleVerifier [0x7ff694e71902+5f2282]
+	chromedriver!GetHandleVerifier [0x7ff694e97115+617a95]
+	chromedriver!GetHandleVerifier [0x7ff6948b1dce+3274e]
+	chromedriver!GetHandleVerifier [0x7ff6948ba82c+3b1ac]
+	chromedriver!GetHandleVerifier [0x7ff69489d744+1e0c4]
+	chromedriver!GetHandleVerifier [0x7ff69489d8d4+1e254]
+	chromedriver!GetHandleVerifier [0x7ff694881447+1dc7]
+	KERNEL32!BaseThreadInitThunk [0x7ffc1f10e957+17]
+	ntdll!RtlUserThreadStart [0x7ffc2064ad6c+2c]
+
