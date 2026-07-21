@@ -41,6 +41,16 @@ class LoginPage:
             "//p[contains(@class,'text-destructive') and normalize-space()='Password is required']"
         )
 
+        self.forgot_password_link = (
+            By.XPATH,
+            "//a[normalize-space()='Forgot password?']"
+        )
+
+        self.signup_link = (
+            By.XPATH,
+            "//a[normalize-space()='Sign up']"
+        )
+
     @allure.step("Submit login form as {user}")
     def login(self, user, pwd):
         print("Current URL:", self.driver.current_url)
@@ -59,6 +69,17 @@ class LoginPage:
 
     def is_on_login_page(self):
         return "/auth" in self.driver.current_url
+
+    def wait_for_login_success(self, timeout=20):
+        """Waits for the post-login redirect to finish, using the
+        dashboard's user-menu avatar (title contains '@') as the confirming
+        signal. A raw URL check right after clicking Sign in is unreliable:
+        the OAuth callback URL (.../auth/callback?code=...) also contains
+        the substring '/auth', so is_on_login_page() can still read True
+        mid-redirect."""
+        WebDriverWait(self.driver, timeout).until(
+            EC.visibility_of_element_located((By.XPATH, "//span[contains(@title,'@')]"))
+        )
 
     def get_login_error(self, timeout=10):
         try:
@@ -83,3 +104,25 @@ class LoginPage:
             ).text
         except TimeoutException:
             return None
+
+    def get_email_validation_message(self):
+        """Returns the browser's native HTML5 constraint-validation message
+        for the email field (e.g. malformed address blocking submission),
+        or '' if the field currently satisfies native validation. The email
+        input is type="email", so malformed values (missing '@', embedded
+        spaces, etc.) never reach the app's own error handling at all —
+        this reads the browser's own tooltip text instead."""
+        email_field = self.driver.find_element(*self.username)
+        return self.driver.execute_script("return arguments[0].validationMessage;", email_field)
+
+    @allure.step("Click 'Forgot password?' link")
+    def click_forgot_password(self):
+        self.wait.until(
+            EC.element_to_be_clickable(self.forgot_password_link)
+        ).click()
+
+    @allure.step("Click 'Sign up' link")
+    def click_signup(self):
+        self.wait.until(
+            EC.element_to_be_clickable(self.signup_link)
+        ).click()

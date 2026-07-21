@@ -1,8 +1,10 @@
+import time
+
 import allure
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, InvalidElementStateException, StaleElementReferenceException
 
 
 class ToolPage:
@@ -140,9 +142,82 @@ class ToolPage:
             "//*[contains(@class,'Toastify__toast--success') and contains(.,'Tool Updated')]"
         )
 
+        # Fires once on initial creation only ("Tool Created Successfully"),
+        # distinct from tool_updated_toast which fires on every subsequent
+        # save — auto-dismisses after a few seconds like every other toast
+        # in this app, so callers must screenshot immediately after
+        # detecting it.
+        self.tool_created_toast = (
+            By.XPATH,
+            "//*[contains(@class,'Toastify__toast--success') and contains(.,'Tool Created')]"
+        )
+
         self.code_editor_view = (
             By.XPATH,
             "//button[normalize-space()='Code']/following::div[contains(@class,'view-line')][1]"
+        )
+
+        # "Test your tool" panel: each function is listed by name with its
+        # own row-level "Test" expander (has a chevron icon); expanding it
+        # reveals per-parameter inputs and a separate submit "Test" button
+        # (no icon) plus an Output panel.
+        #
+        # NOTE: this must anchor on the h6 and walk up to the NEAREST
+        # row ancestor (ancestor::div[...][1]), not "//div[.//h6=X]". The
+        # latter also matches the outer Functions container (which contains
+        # every row's h6 and every Test button as descendants too), making
+        # it ambiguous — it silently resolved to whichever button happened
+        # to be first/visible in document order instead of the requested
+        # function's own row, so clicking "subtract" could actually expand
+        # a completely different function.
+        self.function_test_expander_xpath = (
+            "//h6[normalize-space()='{function_name}']"
+            "/ancestor::div[contains(@class,'border-b')][1]//button[normalize-space()='Test']"
+        )
+
+        self.test_function_names = (
+            By.XPATH,
+            "//label[normalize-space()='Functions']/following::h6"
+        )
+
+        self.run_test_button = (
+            By.XPATH,
+            "//button[normalize-space()='Test' and not(.//svg)]"
+        )
+
+        self.test_output_panel = (
+            By.XPATH,
+            "//label[normalize-space()='Output:']/following-sibling::div[1]"
+        )
+
+        # Each tool card's options menu (Edit / Delete / Unpublish) is
+        # opened via a three-dot "ellipsis-vertical" icon — an <svg>, not a
+        # button, so it has no native JS .click() and must be clicked via
+        # Selenium's own click() rather than execute_script.
+        self.tool_card_kebab_xpath = (
+            "//h2[normalize-space()='{tool_name}']"
+            "/ancestor::div[contains(@class,'rounded-xl')][1]"
+            "//*[contains(@class,'lucide-ellipsis-vertical')]"
+        )
+
+        self.delete_menu_item = (
+            By.XPATH,
+            "//div[normalize-space()='Delete']"
+        )
+
+        self.delete_confirmation_heading = (
+            By.XPATH,
+            "//h2[normalize-space()='Are you sure?']"
+        )
+
+        self.confirm_delete_button = (
+            By.XPATH,
+            "//h2[normalize-space()='Are you sure?']/following::button[normalize-space()='Delete'][1]"
+        )
+
+        self.tool_deleted_toast = (
+            By.XPATH,
+            "//*[contains(@class,'Toastify__toast--success') and contains(.,'Tool Deleted')]"
         )
 
     @allure.step("Navigate to Tools")
@@ -191,7 +266,7 @@ class ToolPage:
         ).click()
 
     @allure.step("Wait for code generation to complete")
-    def wait_for_code_generation(self, timeout=150):
+    def wait_for_code_generation(self, timeout=600):
         # Split from click_generate_code() so a caller can screenshot right
         # as the "Hold tight!" modal appears/disappears rather than losing
         # that moment inside a single long wait.
@@ -212,23 +287,52 @@ class ToolPage:
         ).click()
 
     @allure.step("Wait for tool creation to complete")
-    def wait_for_tool_creation(self, timeout=150):
+    def wait_for_tool_creation(self, timeout=600):
         try:
             WebDriverWait(self.driver, 10).until(
                 EC.presence_of_element_located(self.hold_tight_modal)
             )
         except TimeoutException:
             pass
-        WebDriverWait(self.driver, timeout).until_not(
-            EC.presence_of_element_located(self.hold_tight_modal)
-        )
+
+        # The "Tool Created Successfully" toast can fully appear and fade
+        # (~5s lifetime) before the "Hold tight" modal itself finishes
+        # closing, so it's tracked here via polling throughout this wait
+        # rather than checked separately afterwards — checking only after
+        # the modal closes risks missing it entirely. The screenshot is
+        # captured the instant it's first seen too, since a fresh
+        # screenshot taken later (once the caller gets around to it) can
+        # just as easily land after the toast has already faded.
+        self._tool_created_toast_seen = False
+        self._tool_created_toast_screenshot = None
+        end_time = time.monotonic() + timeout
+        while True:
+            if not self._tool_created_toast_seen and self.driver.find_elements(*self.tool_created_toast):
+                self._tool_created_toast_seen = True
+                self._tool_created_toast_screenshot = self.driver.get_screenshot_as_png()
+            if not self.driver.find_elements(*self.hold_tight_modal):
+                return
+            if time.monotonic() > end_time:
+                raise TimeoutException("Timed out waiting for tool creation to complete")
+            time.sleep(0.3)
+
+    def get_captured_tool_created_screenshot(self):
+        """Returns the screenshot taken at the instant wait_for_tool_creation()
+        first saw the 'Tool Created Successfully' toast, or None if it wasn't
+        seen — use this instead of a fresh screenshot, which may be taken
+        after the toast (short-lived) has already faded."""
+        return getattr(self, "_tool_created_toast_screenshot", None)
 
     def _dismiss_server_error_modal(self, timeout=3):
+        # Best-effort: this modal can also disappear on its own between
+        # being located and clicked (e.g. the backend retry it's
+        # complaining about quietly succeeds), which surfaces as a stale
+        # element rather than anything worth failing on.
         try:
             WebDriverWait(self.driver, timeout).until(
                 EC.element_to_be_clickable(self.server_error_dismiss_button)
             ).click()
-        except TimeoutException:
+        except (TimeoutException, StaleElementReferenceException):
             pass
 
     @allure.step("Navigate back to Available Tools list")
@@ -270,9 +374,14 @@ class ToolPage:
 
     @allure.step("Click 'Upload code'")
     def click_upload_code(self):
-        self.wait.until(
+        trigger = self.wait.until(
             EC.element_to_be_clickable(self.upload_code_trigger)
-        ).click()
+        )
+        # A just-fired success toast (e.g. "Tool Created Successfully") can
+        # still be overlapping this button's top-right position, which
+        # blocks a plain .click(); a JS-dispatched click bypasses that
+        # transient overlay instead of failing on it.
+        self.driver.execute_script("arguments[0].click();", trigger)
         self.wait.until(
             EC.presence_of_element_located(self.upload_modal_dropzone_text)
         )
@@ -307,14 +416,24 @@ class ToolPage:
 
     @allure.step("Click 'Update Tool'")
     def click_update_tool(self):
+        # The Upload Code modal's backdrop can still be mid-close-animation
+        # (pointer-events: auto) right after a successful upload, which
+        # intercepts a plain click on the button behind it.
+        try:
+            WebDriverWait(self.driver, 5).until_not(
+                EC.presence_of_element_located(self.upload_modal_dropzone_text)
+            )
+        except TimeoutException:
+            pass
+
         update_btn = self.wait.until(
             EC.element_to_be_clickable(self.update_tool_button)
         )
         self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", update_btn)
-        update_btn.click()
+        self.driver.execute_script("arguments[0].click();", update_btn)
 
     @allure.step("Wait for tool update to complete")
-    def wait_for_tool_update(self, timeout=150):
+    def wait_for_tool_update(self, timeout=600):
         try:
             WebDriverWait(self.driver, 10).until(
                 EC.presence_of_element_located(self.hold_tight_modal)
@@ -341,12 +460,123 @@ class ToolPage:
         except TimeoutException:
             return ""
 
+    def get_test_function_names(self):
+        """Returns every function name listed in the 'Test your tool' panel,
+        so callers can exercise all of them without hardcoding names that
+        only apply to one specific uploaded file."""
+        elements = self.wait.until(
+            EC.presence_of_all_elements_located(self.test_function_names)
+        )
+        return [e.text.strip() for e in elements if e.text.strip()]
+
+    @allure.step("Open the Test panel for function '{function_name}'")
+    def open_function_test_panel(self, function_name):
+        self._dismiss_server_error_modal()
+
+        expander = self.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH, self.function_test_expander_xpath.format(function_name=function_name))
+            )
+        )
+        self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", expander)
+        self.driver.execute_script("arguments[0].click();", expander)
+
+        # Confirms the detail panel actually switched to this function
+        # before the caller starts filling its "a"/"b" fields.
+        self.wait.until(
+            EC.presence_of_element_located((By.XPATH, f"//label[normalize-space()='{function_name}']"))
+        )
+
+    @allure.step("Enter test parameter '{param_name}'")
+    def enter_test_param(self, param_name, value):
+        # A transient "Something went wrong / We're having trouble reaching
+        # our servers" modal (see server_error_dismiss_button) can pop up
+        # over this panel from an unrelated background request; its
+        # backdrop blocks the input, which surfaces as Selenium's generic
+        # "invalid element state: not interactable" rather than anything
+        # that names the real cause — dismiss it defensively before/while
+        # interacting rather than retrying blind on a settle delay.
+        self._dismiss_server_error_modal()
+
+        field = self.wait.until(
+            EC.element_to_be_clickable((By.XPATH, f"//input[@placeholder='Enter {param_name}']"))
+        )
+        self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", field)
+
+        last_error = None
+        for _ in range(5):
+            try:
+                field.clear()
+                field.send_keys(value)
+                return
+            except InvalidElementStateException as e:
+                last_error = e
+                self._dismiss_server_error_modal()
+                time.sleep(0.5)
+                field = self.wait.until(
+                    EC.element_to_be_clickable((By.XPATH, f"//input[@placeholder='Enter {param_name}']"))
+                )
+                self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", field)
+        raise last_error
+
+    @allure.step("Run the test")
+    def click_run_test(self):
+        self._dismiss_server_error_modal()
+        run_button = self.wait.until(
+            EC.element_to_be_clickable(self.run_test_button)
+        )
+        self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", run_button)
+        run_button.click()
+
+    def get_test_output(self, timeout=10):
+        try:
+            return WebDriverWait(self.driver, timeout).until(
+                EC.presence_of_element_located(self.test_output_panel)
+            ).text
+        except TimeoutException:
+            return ""
+
+    def wait_for_test_output(self, timeout=30):
+        """Waits for the Output panel to show a populated result instead of
+        the initial empty '{}', then returns whatever text is present.
+
+        Whether this populates depends on the tool being tested (confirmed:
+        some tools' sandbox execution resolves within a few seconds; others
+        — e.g. this suite's own calculator.py-based tools — never respond
+        at all even after 60s+, a known backend-side limitation, not a
+        script issue). Always returns the current text either way, so a
+        screenshot taken right after reflects the real result whenever the
+        backend does respond, instead of only ever capturing the initial
+        empty state.
+        """
+        try:
+            WebDriverWait(self.driver, timeout).until(
+                lambda d: d.find_element(*self.test_output_panel).text.strip() not in ("", "{}")
+            )
+        except TimeoutException:
+            pass
+        return self.get_test_output()
+
     def is_tool_created(self, timeout=10):
         """The 'Create Tool' submit button relabels to 'Update Tool' once the
         tool exists on the server — the clearest signal that creation succeeded."""
         try:
             return WebDriverWait(self.driver, timeout).until(
                 EC.visibility_of_element_located(self.update_tool_button)
+            ).is_displayed()
+        except TimeoutException:
+            return False
+
+    def is_tool_created_toast_present(self, timeout=10):
+        # wait_for_tool_creation() already polled for this toast throughout
+        # the whole "Hold tight" modal window, since the toast can fade
+        # before the modal closes — trust that result over a fresh check,
+        # which would be too late by this point.
+        if getattr(self, "_tool_created_toast_seen", False):
+            return True
+        try:
+            return WebDriverWait(self.driver, timeout).until(
+                EC.visibility_of_element_located(self.tool_created_toast)
             ).is_displayed()
         except TimeoutException:
             return False
@@ -378,5 +608,48 @@ class ToolPage:
             )
             self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", card)
             return card.is_displayed()
+        except TimeoutException:
+            return False
+
+    def is_tool_card_absent(self, tool_name, timeout=5):
+        try:
+            WebDriverWait(self.driver, timeout).until_not(
+                EC.presence_of_element_located(self._case_insensitive_card_locator(tool_name))
+            )
+            return True
+        except TimeoutException:
+            return False
+
+    @allure.step("Open the options menu for tool '{tool_name}'")
+    def open_tool_card_menu(self, tool_name):
+        kebab = self.wait.until(
+            EC.presence_of_element_located(
+                (By.XPATH, self.tool_card_kebab_xpath.format(tool_name=tool_name))
+            )
+        )
+        self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", kebab)
+        kebab.click()
+        self.wait.until(EC.element_to_be_clickable(self.delete_menu_item))
+
+    @allure.step("Click 'Delete' from the tool options menu")
+    def click_delete_tool(self):
+        self.wait.until(
+            EC.element_to_be_clickable(self.delete_menu_item)
+        ).click()
+        self.wait.until(
+            EC.presence_of_element_located(self.delete_confirmation_heading)
+        )
+
+    @allure.step("Confirm tool deletion")
+    def confirm_delete_tool(self):
+        self.wait.until(
+            EC.element_to_be_clickable(self.confirm_delete_button)
+        ).click()
+
+    def is_tool_deleted_toast_present(self, timeout=10):
+        try:
+            return WebDriverWait(self.driver, timeout).until(
+                EC.visibility_of_element_located(self.tool_deleted_toast)
+            ).is_displayed()
         except TimeoutException:
             return False

@@ -1,0 +1,4 @@
+Agent: Title Generator Assistant
+Card: Document Title Generator Orchestrator
+Provider: Bedrock
+Model: Gemma 3 12B IT

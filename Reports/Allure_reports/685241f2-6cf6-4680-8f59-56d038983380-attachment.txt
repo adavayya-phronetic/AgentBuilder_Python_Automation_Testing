@@ -1,0 +1,2 @@
+Agent: Motivational Quote Assistant
+Sub-agent: MotivationalQuoteGenerator (agent-0)

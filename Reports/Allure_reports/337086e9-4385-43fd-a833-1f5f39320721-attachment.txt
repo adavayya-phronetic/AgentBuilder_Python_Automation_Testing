@@ -1,0 +1,3 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Loaded calculator.py onto tool 'QA_Automation_Tool_20260713130645'.
+Test output for add(20, 30): '{}'

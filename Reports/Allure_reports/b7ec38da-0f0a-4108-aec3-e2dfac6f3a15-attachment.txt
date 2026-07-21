@@ -1,0 +1,4 @@
+Agent: Email Drafter
+Card: Email Drafting and Refinement Agent
+Provider: Bedrock
+Model: Claude Opus 4.5

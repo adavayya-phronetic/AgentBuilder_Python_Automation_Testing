@@ -1,0 +1,1 @@
+Forgot password URL: https://auth.phronetic.ai/forgot-password?redirect_uri=https%3A%2F%2Fagent-builder.phronetic.ai%2Fauth%2Fcallback&client_id=agent-builder&code_challenge=TMTbSQKpYUYDsQufWpzzakl_pxGM7MtmXY2N-7pLRvM

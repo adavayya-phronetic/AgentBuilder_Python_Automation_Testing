@@ -1,0 +1,3 @@
+Confirmed empty-name validation error for orchestrator of 'Checklist Maker'.
+Confirmed non-alphanumeric name triggers inline error for orchestrator of 'Checklist Maker'.
+Confirmed original name restored cleanly for orchestrator of 'Checklist Maker' with no validation errors.

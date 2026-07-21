@@ -42,8 +42,8 @@ def test_create_agent(driver):
         # "Agent Deployed Successfully!" — it hits a duplicate-name error
         # instead.
         agents_page.enter_prompt(
-            f"Create an assistant (ref #{unique_id}) that explains educational topics in simple language. Use default settings only."
-            f"Do not ask follow-up questions, just do the basic configuration only."
+            f"Create an assistant (ref #{unique_id}) that generates motivational quotes."
+            f"Do not ask follow-up questions,just do the basic configuration."
         )
 
         agents_page.click_create_agent()

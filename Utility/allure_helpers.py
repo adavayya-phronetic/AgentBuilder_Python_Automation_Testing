@@ -6,7 +6,7 @@ from datetime import datetime
 import allure
 
 
-def attach_and_save_screenshot(driver, request, name):
+def attach_and_save_screenshot(driver, request, name, png_bytes=None):
     """Like attach_step_screenshot, but also saves the screenshot as its own
     file in Screenshot/Passed, alongside the generic final-state screenshot
     conftest.py captures at test teardown.
@@ -17,8 +17,13 @@ def attach_and_save_screenshot(driver, request, name):
     by a later recovery step) is otherwise only visible in the Allure
     report. Use this instead of attach_step_screenshot for moments worth
     keeping in both places.
+
+    Pass png_bytes when the moment being documented is short-lived (an
+    auto-dismissing toast) and was already captured earlier at the exact
+    right instant — a screenshot taken fresh, right here, could just as
+    easily land after it has faded.
     """
-    attach_step_screenshot(driver, name)
+    attach_step_screenshot(driver, name, png_bytes=png_bytes)
     try:
         timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
         # Step names often contain ':' ('Case 1: ...') which is invalid in
@@ -29,21 +34,24 @@ def attach_and_save_screenshot(driver, request, name):
         file_name = f"{request.node.name}_{safe_name}_{timestamp}"
         os.makedirs("Screenshot/Passed", exist_ok=True)
         with open(f"Screenshot/Passed/{file_name}.png", "wb") as f:
-            f.write(driver.get_screenshot_as_png())
+            f.write(png_bytes if png_bytes is not None else driver.get_screenshot_as_png())
     except Exception as e:
         print(f"Failed to save extra screenshot '{name}': {e}")
 
 
-def attach_step_screenshot(driver, name):
+def attach_step_screenshot(driver, name, png_bytes=None):
     """Attaches a screenshot of the current browser state to the Allure report.
 
     Called at the end of every test step so the report has a full,
     reviewable sequence of what the browser actually looked like at each
     stage — useful when the run itself happens too fast to watch live.
+
+    Pass png_bytes to attach an already-captured screenshot instead of
+    taking a fresh one now (see attach_and_save_screenshot).
     """
     try:
         allure.attach(
-            driver.get_screenshot_as_png(),
+            png_bytes if png_bytes is not None else driver.get_screenshot_as_png(),
             name=name,
             attachment_type=allure.attachment_type.PNG
         )

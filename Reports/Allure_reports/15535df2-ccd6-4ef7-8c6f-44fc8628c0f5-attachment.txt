@@ -1,0 +1,4 @@
+Confirmed empty-name validation error for agent 'Title Generator Assistant'.
+Confirmed whitespace-only agent name is rejected for 'Title Generator Assistant'.
+Confirmed non-alphanumeric name triggers inline error for agent 'Title Generator Assistant'.
+Confirmed agent 'Title Generator Assistant' name restored cleanly with no validation errors.

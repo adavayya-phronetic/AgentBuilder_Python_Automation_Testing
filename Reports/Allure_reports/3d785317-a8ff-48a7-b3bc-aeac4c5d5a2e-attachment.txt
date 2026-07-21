@@ -1,0 +1,23 @@
+Failed to capture test artifacts: Message: invalid session id; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception
+Stacktrace:
+	msedgedriver!GetHandleVerifier [0x7ff7978b74c5+e415]
+	msedgedriver!GetHandleVerifier [0x7ff7978b7524+e474]
+	msedgedriver!(No symbol) [0x7ff79726614e]
+	msedgedriver!(No symbol) [0x7ff7972a5615]
+	msedgedriver!(No symbol) [0x7ff7972d0c22]
+	msedgedriver!(No symbol) [0x7ff79725ddc1]
+	msedgedriver!(No symbol) [0x7ff7972cd1ad]
+	msedgedriver!(No symbol) [0x7ff7972cca42]
+	msedgedriver!(No symbol) [0x7ff79723db2b]
+	msedgedriver!(No symbol) [0x7ff79723e122]
+	msedgedriver!(No symbol) [0x7ff79723e655]
+	msedgedriver!(No symbol) [0x7ff7974e1131]
+	msedgedriver!(No symbol) [0x7ff7974dd54f]
+	msedgedriver!(No symbol) [0x7ff7974ee3d9]
+	msedgedriver!GetHandleVerifier [0x7ff7978d2bb1+29b01]
+	msedgedriver!GetHandleVerifier [0x7ff7978db3b6+32306]
+	msedgedriver!(No symbol) [0x7ff79723d2b5]
+	msedgedriver!GetHandleVerifier [0x7ff797b1b9d8+272928]
+	KERNEL32!BaseThreadInitThunk [0x7ffc1f10e957+17]
+	ntdll!RtlUserThreadStart [0x7ffc2064ad6c+2c]
+
