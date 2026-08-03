@@ -1,4 +1,0 @@
-Agent: Checklist Creator
-Card: Checklist Creator Orchestrator
-Provider: Bedrock
-Model: GLM 4.7 Flash

@@ -1,4 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Confirmed empty-instructions validation error for orchestrator of 'Document Organizer'.
-Confirmed whitespace-only instructions are rejected for orchestrator of 'Document Organizer'.
-Confirmed orchestrator of 'Document Organizer' redeploys successfully once valid instructions are restored.

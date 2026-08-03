@@ -1,1 +1,0 @@
-Testing agent 'Simple To-Do List Assistant', card 'ToDoListGenerator', provider 'Bedrock', model 'Qwen3 Coder 30B A3B Instruct'

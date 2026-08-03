@@ -31,6 +31,19 @@ class DashboardPage:
             "//*[normalize-space()='Get Started']"
         )
 
+        self.create_agent_button = (
+            By.XPATH,
+            "//button[contains(normalize-space(.),'Create Agent')]"
+        )
+
+    @allure.step("Click 'Create Agent'")
+    def click_create_agent(self):
+        self.wait.until(
+            EC.element_to_be_clickable(self.create_agent_button)
+        ).click()
+        # Navigates straight to the My Agents prompt page (/agents).
+        self.wait.until(EC.url_contains("/agents"))
+
     @allure.step("Log out via user menu")
     def logout(self):
         self.wait.until(

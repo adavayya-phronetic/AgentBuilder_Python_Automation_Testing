@@ -1,6 +1,0 @@
-Loaded calculator.py onto tool 'QA_Automation_Tool_20260714141036'.
-Functions found in Test your tool panel: ['add', 'subtract', 'multiply', 'divide']
-Test output for add(20, 30): '{}'
-Test output for subtract(20, 30): '{}'
-Test output for multiply(20, 30): '{}'
-Test output for divide(20, 30): '{}'

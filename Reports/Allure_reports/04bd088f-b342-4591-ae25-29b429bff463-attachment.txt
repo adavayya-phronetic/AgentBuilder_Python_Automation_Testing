@@ -1,2 +1,0 @@
-Testing agent 'Simple To-Do Maker', card 'SimpleToDoListAssistant', provider 'Bedrock', model 'Kimi K2.5'
-Set provider 'Bedrock' with model 'Kimi K2.5', attached tools ['Convert_Language', 'Addition'] to 'SimpleToDoListAssistant', and redeployed agent 'Simple To-Do Maker'.

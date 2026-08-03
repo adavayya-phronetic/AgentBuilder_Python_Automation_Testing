@@ -1,2 +1,0 @@
-Testing agent 'Three-Point Text Summarizer', card 'Text Summarizer Orchestrator', provider 'Bedrock', model 'DeepSeek v3.2'
-Set provider 'Bedrock' with model 'DeepSeek v3.2', attached tools ['Convert_Language', 'Addition'] to 'Text Summarizer Orchestrator', and redeployed agent 'Three-Point Text Summarizer'.

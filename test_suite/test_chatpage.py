@@ -1,5 +1,6 @@
 import os
 import random
+from urllib.parse import urlparse
 
 import allure
 import pytest
@@ -9,10 +10,10 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from Webpages.landing_page import LandingPage
 from Webpages.login_page import LoginPage
-from Webpages.my_agent_page import MyAgentsPage
+from Webpages.my_agents_page import MyAgentsPage
 from Webpages.chat_page import ChatPage
 from Utility import config
-from Utility.allure_helpers import attach_step_screenshot
+from Utility.allure_helpers import attach_step_screenshot, attach_and_save_screenshot
 
 
 def _open_chat_tab_in_new_window(driver):
@@ -43,17 +44,18 @@ def _open_random_active_agent_chat(driver):
     return target_agent_name
 
 
-def _close_chat_tab(driver, main_window):
+def _close_chat_tab(driver, main_window, request):
     # The generic pass/fail screenshot fixture in conftest.py captures the
-    # main window after this test has already switched back to it (and
-    # after the shared session gets reset to /agents), so it never shows
-    # the chat tab itself. Attach a screenshot of the chat tab here, before
-    # it's closed, so the report reflects what actually happened.
+    # main window after this test has already switched back to it (and the
+    # chat tab has already been closed), so it can never show the chat tab
+    # itself — that content is structurally gone by the time it runs. Save
+    # the chat tab's real final state here, before it's closed, using
+    # attach_and_save_screenshot so a meaningful screenshot actually lands
+    # on disk in Screenshot/Passed instead of only the Allure report.
     try:
-        allure.attach(
-            driver.get_screenshot_as_png(),
-            name="Chat tab screenshot",
-            attachment_type=allure.attachment_type.PNG
+        attach_and_save_screenshot(
+            driver, request, "Chat tab final state",
+            png_bytes=driver.get_screenshot_as_png()
         )
     except Exception as e:
         print(f"Failed to capture chat tab screenshot: {e}")
@@ -61,13 +63,30 @@ def _close_chat_tab(driver, main_window):
     driver.close()
     driver.switch_to.window(main_window)
 
+    # main_window sat idle for this entire test (everything happened in the
+    # chat tab instead), often long enough that its session/auth state goes
+    # stale and it drifts into a transient "Redirecting, please wait..."
+    # interstitial. conftest.py's teardown screenshot captures whatever is
+    # on screen at this exact moment, so without settling main_window back
+    # onto a real page first, that screenshot ends up showing the loader
+    # instead of anything meaningful.
+    try:
+        parsed = urlparse(driver.current_url)
+        agents_url = f"{parsed.scheme}://{parsed.netloc}/agents"
+        driver.get(agents_url)
+        WebDriverWait(driver, 20).until(
+            EC.visibility_of_element_located(MyAgentsPage(driver).search_input)
+        )
+    except Exception as e:
+        print(f"Failed to settle main window back onto /agents: {e}")
+
 
 @allure.feature("Agent Interaction")
 @allure.story("Chat")
 @allure.title("Full chat flow: open agent, chat, start a new chat, upload a file and ask for a summary")
 @allure.severity(allure.severity_level.CRITICAL)
 @pytest.mark.chat
-def test_chat_interact_new_chat_and_file_upload(driver):
+def test_chat_interact_new_chat_and_file_upload(driver, request):
     # One chained flow rather than independent test functions because each
     # stage depends on state the previous stage left behind: the new chat
     # needs an existing conversation to move on from, and the file-upload
@@ -139,7 +158,11 @@ def test_chat_interact_new_chat_and_file_upload(driver):
                 lambda d: len(d.find_elements(By.XPATH, "//*[contains(text(),'Thinking')]")) == 0
             )
             print(f"Step 4 OK: '{file_name}' uploaded and agent responded with a summary.")
-            attach_step_screenshot(driver, "Step 4: File uploaded and summarized")
+            # This is the moment the test is actually named for — saved to
+            # disk (not just attached to Allure) so a meaningful screenshot
+            # of it survives in Screenshot/Passed, since the test's own
+            # final state (after Step 8 logs out) is always the login page.
+            attach_and_save_screenshot(driver, request, "Step 4: File uploaded and summarized")
 
         with allure.step("Step 5: View agent details, check Usage History, and navigate back to Chat"):
             chat_url = chat_page.get_current_url()
@@ -233,6 +256,6 @@ def test_chat_interact_new_chat_and_file_upload(driver):
                 f"Step 8 failed: expected redirect to the login page after logout, got '{final_url}'"
             )
             print("Step 8 OK: logged out and redirected to the login page:", final_url)
-            attach_step_screenshot(driver, "Step 8: Logged out")
+            attach_and_save_screenshot(driver, request, "Step 8: Logged out")
     finally:
-        _close_chat_tab(driver, main_window)
+        _close_chat_tab(driver, main_window, request)

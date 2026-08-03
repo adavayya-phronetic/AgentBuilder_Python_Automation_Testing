@@ -1,4 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Agent URL: https://agent-builder.phronetic.ai/build-agent/configure
-Generated agent name: NameGen Assistant
-WARNING: Agent 'NameGen Assistant' was created but did not yet appear in the My Agents list (backend indexing lag).

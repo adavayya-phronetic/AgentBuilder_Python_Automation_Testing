@@ -1,2 +1,0 @@
-Full name : 'Simple ExplainBot'
-Search term: 'ExplainBot'

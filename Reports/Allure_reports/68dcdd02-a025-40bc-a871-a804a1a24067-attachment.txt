@@ -1,4 +1,0 @@
-Agent: Three-Point Text Summarizer
-Card: Text Summarizer Orchestrator
-Provider: Bedrock
-Model: mistral.ministral-3-14b-instruct

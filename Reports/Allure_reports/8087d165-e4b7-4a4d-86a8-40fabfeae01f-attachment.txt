@@ -1,1 +1,0 @@
-Confirmed empty-instructions validation error for sub-agent 'ImageProcessorAgent' of 'Dataset Collection Agent'.

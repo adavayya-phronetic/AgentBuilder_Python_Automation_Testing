@@ -1,2 +1,0 @@
-Confirmed empty-instructions validation error for sub-agent 'Motivational Quote Provider' of 'StudentMarksAssistant'.
-Restored original instructions for sub-agent 'Motivational Quote Provider'.

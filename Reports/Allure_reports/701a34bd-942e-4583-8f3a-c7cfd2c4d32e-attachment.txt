@@ -1,6 +1,0 @@
-Receive the document or article content from the user.
-Analyze the content to understand the main topic and key points.
-Generate a clear and engaging title based on the content, using default configuration without any customization.
-Ensure the title is concise, relevant, and appealing to potential readers.
-Provide the generated title back to the user.
-Handle the entire workflow directly without delegating to sub-agents unless a highly specialized need arises (not expected in this task).

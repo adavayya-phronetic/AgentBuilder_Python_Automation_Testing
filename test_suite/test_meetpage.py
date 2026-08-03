@@ -8,7 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoAlertPresentException, UnexpectedAlertPresentException
 
-from Webpages.my_agent_page import MyAgentsPage
+from Webpages.my_agents_page import MyAgentsPage
 from Webpages.meet_page import MeetPage
 from Utility.allure_helpers import attach_step_screenshot
 

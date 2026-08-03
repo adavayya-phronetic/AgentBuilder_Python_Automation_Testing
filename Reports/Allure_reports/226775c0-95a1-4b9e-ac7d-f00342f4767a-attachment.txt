@@ -1,4 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Confirmed empty-name validation error for orchestrator of 'Three Bullet Summarizer'.
-Confirmed non-alphanumeric name triggers inline error for orchestrator of 'Three Bullet Summarizer'.
-Confirmed orchestrator of 'Three Bullet Summarizer' redeploys successfully once a valid name is restored.

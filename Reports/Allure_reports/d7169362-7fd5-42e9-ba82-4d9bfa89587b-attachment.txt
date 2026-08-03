@@ -1,2 +1,0 @@
-Agent: StudentMarksAssistant
-Sub-agent: Motivational Quote Provider (agent-0)

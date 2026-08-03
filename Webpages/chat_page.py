@@ -4,7 +4,7 @@ import allure
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, ElementClickInterceptedException
 
 
 class ChatPage:
@@ -141,9 +141,18 @@ class ChatPage:
         field.click()
         field.send_keys(message)
 
-        self.wait.until(
+        send_button = self.wait.until(
             EC.element_to_be_clickable(self.send_button)
-        ).click()
+        )
+        try:
+            send_button.click()
+        except ElementClickInterceptedException:
+            # A destructive/error toast can pop up and briefly overlap the
+            # send button right after a file upload — element_to_be_clickable
+            # only checks visibility/enabled state, not whether something
+            # else is on top, so a native click can still get intercepted.
+            # A JS click dispatches directly on the button regardless.
+            self.driver.execute_script("arguments[0].click();", send_button)
 
     @allure.step("Start a new chat")
     def start_new_chat(self):

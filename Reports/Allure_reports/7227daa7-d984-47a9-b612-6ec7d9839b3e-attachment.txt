@@ -1,2 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Invalid password error message: Incorrect email or password

@@ -1,4 +1,0 @@
-Agent: Plain Language Explainer
-Card: SimpleLanguageEducationAssistant
-Provider: Bedrock
-Model: GLM 4.7 Flash

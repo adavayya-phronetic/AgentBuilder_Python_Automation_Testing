@@ -1,4 +1,0 @@
-Agent: DocSection Organizer
-Card: Document Organizer Orchestrator
-Provider: Bedrock
-Model: qwen.qwen3-next-80b-a3b

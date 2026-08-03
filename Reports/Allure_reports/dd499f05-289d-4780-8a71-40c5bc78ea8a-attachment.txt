@@ -1,2 +1,0 @@
-First conversation URL: https://chat.phronetic.ai/-O0B_eF1a1EWZX1S/chat/9060441b286f4beeb698d03fc8bc9040
-URL after starting new chat: https://chat.phronetic.ai/-O0B_eF1a1EWZX1S/chat?newchat=true

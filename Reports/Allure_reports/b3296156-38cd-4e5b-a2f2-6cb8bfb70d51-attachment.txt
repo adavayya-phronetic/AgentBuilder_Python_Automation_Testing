@@ -1,3 +1,0 @@
-Confirmed empty-instructions validation error for orchestrator of 'Three-Point Text Summarizer'.
-Confirmed whitespace-only instructions are rejected for orchestrator of 'Three-Point Text Summarizer'.
-Confirmed orchestrator of 'Three-Point Text Summarizer' redeploys successfully once valid instructions are restored.

@@ -1,3 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Testing agent 'Three Bullet Summarizer', card 'Summarization Orchestrator', provider 'Bedrock', model 'Kimi K2.5'
-Set provider 'Bedrock' with model 'Kimi K2.5', attached tools ['Convert_Language', 'Addition'] to 'Summarization Orchestrator', and redeployed agent 'Three Bullet Summarizer'.

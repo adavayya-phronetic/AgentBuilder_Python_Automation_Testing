@@ -1,2 +1,0 @@
-Testing agent 'Simple To-Do Creator', card 'ToDoListAssistant', provider 'Bedrock', model 'google.gemma-3-4b-it'
-Set provider 'Bedrock' with model 'google.gemma-3-4b-it', attached tools ['Convert_Language', 'Addition'] to 'ToDoListAssistant', and redeployed agent 'Simple To-Do Creator'.

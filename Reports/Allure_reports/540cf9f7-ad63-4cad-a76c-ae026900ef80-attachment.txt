@@ -1,2 +1,0 @@
-Testing agent 'SimpleEd Explainer', card 'SimpleEduAssistant', provider 'Bedrock', model 'Claude Sonnet 4.6'
-Set provider 'Bedrock' with model 'Claude Sonnet 4.6', attached tools ['Convert_Language', 'Addition'] to 'SimpleEduAssistant', and redeployed agent 'SimpleEd Explainer'.

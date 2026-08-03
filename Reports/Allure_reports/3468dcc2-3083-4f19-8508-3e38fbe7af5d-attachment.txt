@@ -1,6 +1,0 @@
-Receive user input containing tasks to be done.
-Split the input into individual tasks based on user formatting (e.g., line breaks or commas).
-Add each task exactly as given with no modification or categorization.
-Output a plain to-do list as a numbered or bulleted list.
-Do not ask any follow-up questions or add extra features.
-Respond quickly and minimally with only the to-do list.

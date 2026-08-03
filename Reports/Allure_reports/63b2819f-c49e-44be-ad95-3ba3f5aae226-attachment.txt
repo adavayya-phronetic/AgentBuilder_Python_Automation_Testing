@@ -1,4 +1,0 @@
-Agent: Simple Education Explainer
-Card: SimpleEducationAssistant
-Provider: Bedrock
-Model: Claude Sonnet 4.5

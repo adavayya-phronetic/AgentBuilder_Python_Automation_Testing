@@ -1,2 +1,0 @@
-Confirmed: redeployment blocked with model validation error for 'TitleGen Assistant'.
-Restored original provider 'Bedrock' and model for 'TitleGen Assistant'.

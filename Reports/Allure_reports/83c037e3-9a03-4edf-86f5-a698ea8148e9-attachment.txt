@@ -1,4 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Agent URL: https://agent-builder.phronetic.ai/build-agent/configure
-Generated agent name: Concise Q&A Assistant
-Agent created successfully: Concise Q&A Assistant

@@ -1,4 +1,0 @@
-Agent: Everyday Helper
-Card: GeneralAssistantOrchestrator
-Provider: Bedrock
-Model: GLM 4.7 Flash

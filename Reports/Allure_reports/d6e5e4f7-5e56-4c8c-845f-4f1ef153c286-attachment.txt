@@ -1,2 +1,0 @@
-Confirmed empty-instructions validation error for sub-agent 'MotivationalQuoteGenerator' of 'Motivational Quote Assistant'.
-Restored original instructions for sub-agent 'MotivationalQuoteGenerator'.

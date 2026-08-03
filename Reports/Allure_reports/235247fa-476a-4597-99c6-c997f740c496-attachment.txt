@@ -1,4 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Confirmed empty-instructions validation error for orchestrator of '3-Point Summarizer'.
-Confirmed whitespace-only instructions are rejected for orchestrator of '3-Point Summarizer'.
-Confirmed orchestrator of '3-Point Summarizer' redeploys successfully once valid instructions are restored.

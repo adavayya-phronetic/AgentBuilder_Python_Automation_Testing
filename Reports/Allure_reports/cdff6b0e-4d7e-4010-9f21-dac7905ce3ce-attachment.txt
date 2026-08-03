@@ -1,2 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Conversation URL after sending message: https://chat.phronetic.ai/-O0B_eF1a1EWZX1S/chat/5af37ff8ff6f43ea96feca76cfee9310

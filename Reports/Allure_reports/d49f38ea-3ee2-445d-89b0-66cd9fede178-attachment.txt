@@ -1,4 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Confirmed empty-name validation error for orchestrator of 'Customer Support Chatbot Agent'.
-Confirmed non-alphanumeric name triggers inline error for orchestrator of 'Customer Support Chatbot Agent'.
-Confirmed orchestrator of 'Customer Support Chatbot Agent' redeploys successfully once a valid name is restored.

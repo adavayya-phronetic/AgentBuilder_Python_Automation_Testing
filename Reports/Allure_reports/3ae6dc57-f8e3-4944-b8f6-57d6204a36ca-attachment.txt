@@ -1,2 +1,0 @@
-Chat History panel shows 19 joinable past session(s).
-Joined chat history entry successfully. New room URL: https://meet-agents.phronetic.ai/Hiz369oD56ruzSCS/rooms/988aad8ee832477292463dedab9c4b33

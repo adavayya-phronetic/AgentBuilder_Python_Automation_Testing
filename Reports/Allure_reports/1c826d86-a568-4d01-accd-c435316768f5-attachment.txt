@@ -1,2 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Testing agent 'Dataset Collection Agent', card 'ImageProcessorAgent', provider 'Bedrock', model 'moonshot.kimi-k2-thinking'

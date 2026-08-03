@@ -1,4 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Loaded calculator.py onto tool 'QA_Automation_Tool_20260713130524'.
-Functions found in Test your tool panel: ['add', 'subtract', 'multiply', 'divide']
-Test output for add(20, 30): '{}'

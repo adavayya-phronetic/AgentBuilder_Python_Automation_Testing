@@ -1,3 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Confirmed empty-name validation error for orchestrator of '3-Point Summarizer'.
-Confirmed non-alphanumeric name triggers inline error for orchestrator of '3-Point Summarizer'.

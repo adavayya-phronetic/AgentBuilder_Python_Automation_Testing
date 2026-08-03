@@ -1,4 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Confirmed empty-instructions validation error for orchestrator of 'Simple Education Explainer'.
-Confirmed whitespace-only instructions are rejected for orchestrator of 'Simple Education Explainer'.
-Confirmed orchestrator of 'Simple Education Explainer' redeploys successfully once valid instructions are restored.

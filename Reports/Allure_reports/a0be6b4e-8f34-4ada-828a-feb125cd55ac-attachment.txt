@@ -1,3 +1,0 @@
-Testing agent 'Title Generator Assistant', card 'Document Title Generator Orchestrator', provider 'Bedrock', model 'mistral.ministral-3-3b-instruct'
-Confirmed 'Agent Redeployed Successfully!' toast shown for 'Title Generator Assistant'.
-Set provider 'Bedrock' with model 'mistral.ministral-3-3b-instruct', attached tools ['Convert_Language', 'Addition'] to 'Document Title Generator Orchestrator', and redeployed agent 'Title Generator Assistant'.

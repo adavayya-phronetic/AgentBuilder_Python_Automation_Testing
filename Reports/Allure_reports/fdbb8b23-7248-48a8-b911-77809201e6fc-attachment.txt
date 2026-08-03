@@ -1,2 +1,0 @@
-Cancelled delete of 'Git_Reference_Guide.pdf'; file remains in knowledge base.
-Deleted file 'Git_Reference_Guide.pdf' from knowledge base for agent 'Checklist Creator'.

@@ -1,4 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Confirmed empty-instructions validation error for orchestrator of 'TitleGen Assistant'.
-Confirmed whitespace-only instructions are rejected for orchestrator of 'TitleGen Assistant'.
-Confirmed orchestrator of 'TitleGen Assistant' redeploys successfully once valid instructions are restored.

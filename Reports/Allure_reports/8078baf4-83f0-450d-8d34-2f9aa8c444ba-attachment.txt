@@ -1,2 +1,0 @@
-Current URL: https://auth.phronetic.ai/login?client_id=agent-builder&redirect_uri=https%3A%2F%2Fagent-builder.phronetic.ai%2Fauth%2Fcallback&code_challenge=47B71ePIyBWs2ollp4gZ-IrTLApef0-WqCyQEhjTQak
-Invalid email format validation message: Please include an '@' in the email address. 'invalidemail' is missing an '@'.

@@ -1,5 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Agent URL: https://agent-builder.phronetic.ai/build-agent/configure
-Generated agent name: Email Drafter Assistant
-Agent created successfully: Email Drafter Assistant
-Failed to capture test artifacts: HTTPConnectionPool(host='localhost', port=52837): Max retries exceeded with url: /session/477916ab3479d39de88e8a69b3fe3f28/screenshot (Caused by NewConnectionError("HTTPConnection(host='localhost', port=52837): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))

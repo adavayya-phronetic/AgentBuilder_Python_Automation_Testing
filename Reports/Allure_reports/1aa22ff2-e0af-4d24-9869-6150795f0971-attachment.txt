@@ -1,2 +1,0 @@
-Confirmed: redeployment blocked with model validation error for 'Plain Language Explainer'.
-Restored original provider 'Bedrock' and model for 'Plain Language Explainer'.

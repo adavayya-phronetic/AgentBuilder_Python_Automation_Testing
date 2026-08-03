@@ -1,4 +1,0 @@
-Agent: Everyday Helper
-Card: GeneralAssistantOrchestrator
-Provider: Bedrock
-Model: mistral.ministral-3-8b-instruct

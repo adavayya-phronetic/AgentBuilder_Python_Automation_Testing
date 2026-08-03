@@ -1,4 +1,0 @@
-Agent: Plain Language Explainer
-Card: SimpleLanguageEducationAssistant
-Provider: Bedrock
-Model: Qwen3 Coder 480B A35B Instruct

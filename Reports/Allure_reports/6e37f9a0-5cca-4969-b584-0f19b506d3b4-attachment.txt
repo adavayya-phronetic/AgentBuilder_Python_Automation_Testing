@@ -1,3 +1,0 @@
-Current URL: https://auth.phronetic.ai/login?client_id=agent-builder&redirect_uri=https%3A%2F%2Fagent-builder.phronetic.ai%2Fauth%2Fcallback&code_challenge=qcxrAWzO48YmU9aH3O6ItatijW1TpamznxTq0TR2ID0
-Empty email field error: Please enter a valid email
-Empty password field error: Password is required

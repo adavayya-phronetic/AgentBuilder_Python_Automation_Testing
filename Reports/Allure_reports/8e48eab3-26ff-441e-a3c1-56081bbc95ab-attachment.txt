@@ -1,2 +1,0 @@
-Full name : 'Doc Organizer'
-Search term: 'Organizer'

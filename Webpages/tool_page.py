@@ -54,6 +54,35 @@ class ToolPage:
             "//button[normalize-space()='Use Prompt or Files']"
         )
 
+        # The other "Generate" chooser card — builds a tool from an
+        # external MCP server URL instead of a prompt/file upload.
+        self.use_urls_button = (
+            By.XPATH,
+            "//button[normalize-space()='Use URLs']"
+        )
+
+        self.authorization_header_toggle = (
+            By.XPATH,
+            "//button[contains(@class,'peer') and contains(@class,'inline-flex')]"
+        )
+
+        # The header *name* field defaults to a fixed 'X-API-KEY' and is
+        # read-only — only the value is settable.
+        self.header_value_input = (
+            By.XPATH,
+            "//label[normalize-space()='Header Value']/following::input[1]"
+        )
+
+        self.save_header_button = (
+            By.XPATH,
+            "//button[normalize-space()='Save']"
+        )
+
+        self.mcp_url_input = (
+            By.XPATH,
+            "//input[@placeholder=\"Enter your tool's URL\"]"
+        )
+
         self.tool_name_input = (
             By.XPATH,
             "//input[@name='name']"
@@ -180,9 +209,20 @@ class ToolPage:
             "//label[normalize-space()='Functions']/following::h6"
         )
 
+        # svg must be matched via *[local-name()='svg'] rather than a bare
+        # svg element test — chromedriver's XPath evaluator is namespace-aware
+        # for SVG's foreign namespace, so an unprefixed `svg` step silently
+        # matches nothing. With the bare test, not(.//svg) was always true
+        # regardless of whether a button actually had an icon, so this
+        # matched every row-level function expander ("add Test >", "subtract
+        # Test >", ...) in addition to the real submit button — and since
+        # find_element/element_to_be_clickable return the first DOM match,
+        # click_run_test() was clicking whichever expander came first (just
+        # re-toggling its accordion) instead of the real submit button,
+        # which is why the Output panel never actually populated.
         self.run_test_button = (
             By.XPATH,
-            "//button[normalize-space()='Test' and not(.//svg)]"
+            "//button[normalize-space()='Test' and not(.//*[local-name()='svg'])]"
         )
 
         self.test_output_panel = (
@@ -244,6 +284,38 @@ class ToolPage:
         self.wait.until(
             EC.element_to_be_clickable(self.use_prompt_or_files_button)
         ).click()
+
+    @allure.step("Choose the 'External MCP URL' build method")
+    def choose_mcp_url_tool(self):
+        self.wait.until(
+            EC.element_to_be_clickable(self.use_urls_button)
+        ).click()
+
+    @allure.step("Toggle Authorization Header on")
+    def enable_authorization_header(self):
+        self.wait.until(
+            EC.element_to_be_clickable(self.authorization_header_toggle)
+        ).click()
+
+    @allure.step("Enter Authorization Header value")
+    def enter_header_value(self, value):
+        field = self.wait.until(
+            EC.element_to_be_clickable(self.header_value_input)
+        )
+        field.send_keys(value)
+
+    @allure.step("Save the Authorization Header")
+    def click_save_header(self):
+        self.wait.until(
+            EC.element_to_be_clickable(self.save_header_button)
+        ).click()
+
+    @allure.step("Enter MCP URL")
+    def enter_mcp_url(self, url):
+        field = self.wait.until(
+            EC.element_to_be_clickable(self.mcp_url_input)
+        )
+        field.send_keys(url)
 
     @allure.step("Enter tool name '{tool_name}'")
     def enter_tool_name(self, tool_name):
@@ -487,6 +559,27 @@ class ToolPage:
             EC.presence_of_element_located((By.XPATH, f"//label[normalize-space()='{function_name}']"))
         )
 
+    def get_open_test_param_names(self):
+        """Returns the parameter names (from each 'Enter <name>' input
+        placeholder) for whichever function's Test panel is currently open.
+
+        Prompt-generated tools don't have fixed parameter names the way
+        calculator.py's add/subtract/multiply/divide do — the LLM decides
+        them — so callers need to discover them per function rather than
+        assuming 'a'/'b'.
+
+        Scoped to inputs after the 'Functions' label (i.e. within the Test
+        your tool panel itself) rather than the whole page — an MCP-URL
+        tool's Core Instructions section has its own 'Enter your tool's
+        URL' field earlier on the same page, which also starts with
+        'Enter ' and would otherwise get picked up as a false parameter.
+        """
+        inputs = self.driver.find_elements(
+            By.XPATH,
+            "//label[normalize-space()='Functions']/following::input[starts-with(@placeholder,'Enter ')]"
+        )
+        return [i.get_attribute("placeholder")[len("Enter "):].strip() for i in inputs]
+
     @allure.step("Enter test parameter '{param_name}'")
     def enter_test_param(self, param_name, value):
         # A transient "Something went wrong / We're having trouble reaching
@@ -540,14 +633,10 @@ class ToolPage:
         """Waits for the Output panel to show a populated result instead of
         the initial empty '{}', then returns whatever text is present.
 
-        Whether this populates depends on the tool being tested (confirmed:
-        some tools' sandbox execution resolves within a few seconds; others
-        — e.g. this suite's own calculator.py-based tools — never respond
-        at all even after 60s+, a known backend-side limitation, not a
-        script issue). Always returns the current text either way, so a
-        screenshot taken right after reflects the real result whenever the
-        backend does respond, instead of only ever capturing the initial
-        empty state.
+        How long this takes can depend on the tool being tested. Always
+        returns the current text either way, so a screenshot taken right
+        after reflects the real result whenever the backend does respond,
+        instead of only ever capturing the initial empty state.
         """
         try:
             WebDriverWait(self.driver, timeout).until(
@@ -611,7 +700,24 @@ class ToolPage:
         except TimeoutException:
             return False
 
-    def is_tool_card_absent(self, tool_name, timeout=5):
+    def is_tool_card_absent(self, tool_name, timeout=20):
+        # The "Tool Deleted Successfully" toast can fire before the tools
+        # list has actually re-fetched/re-rendered without the deleted
+        # card, so a short wait here can catch it mid-refresh and report a
+        # false negative.
+        try:
+            WebDriverWait(self.driver, timeout).until_not(
+                EC.presence_of_element_located(self._case_insensitive_card_locator(tool_name))
+            )
+            return True
+        except TimeoutException:
+            pass
+
+        # Confirmed: even 20s isn't always enough — the in-memory list
+        # doesn't reliably re-fetch on its own after a delete. A hard
+        # refresh forces a real re-fetch from the server instead of relying
+        # on the SPA's own (apparently unreliable) live list update.
+        self.driver.refresh()
         try:
             WebDriverWait(self.driver, timeout).until_not(
                 EC.presence_of_element_located(self._case_insensitive_card_locator(tool_name))

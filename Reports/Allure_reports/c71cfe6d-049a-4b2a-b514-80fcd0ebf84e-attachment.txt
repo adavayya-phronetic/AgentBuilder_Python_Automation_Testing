@@ -1,2 +1,0 @@
-Testing agent 'Title Generator Assistant', card 'Document Title Generator Orchestrator', provider 'Bedrock', model 'Mistral Large 3'
-Set provider 'Bedrock' with model 'Mistral Large 3', attached tools ['Convert_Language', 'Addition'] to 'Document Title Generator Orchestrator', and redeployed agent 'Title Generator Assistant'.

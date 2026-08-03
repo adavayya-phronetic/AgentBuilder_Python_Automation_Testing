@@ -1,3 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Testing agent 'Dataset Collection Agent', card 'OrchestratorAgent', provider 'Bedrock', model 'google.gemma-3-27b-it'
-Set provider 'Bedrock' with model 'google.gemma-3-27b-it', attached tools ['Convert_Language', 'Addition'] to 'OrchestratorAgent', and redeployed agent 'Dataset Collection Agent'.

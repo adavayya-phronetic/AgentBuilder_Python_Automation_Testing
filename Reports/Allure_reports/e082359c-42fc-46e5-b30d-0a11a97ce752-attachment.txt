@@ -1,2 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Created tool 'QA_Automation_Tool_20260713180011'.

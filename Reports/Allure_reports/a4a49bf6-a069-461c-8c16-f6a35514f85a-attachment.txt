@@ -1,2 +1,0 @@
-Confirmed non-.py upload was rejected for tool 'QA_Automation_Tool_20260713073033'.
-Updated tool 'QA_Automation_Tool_20260713073033' with calculator.py.

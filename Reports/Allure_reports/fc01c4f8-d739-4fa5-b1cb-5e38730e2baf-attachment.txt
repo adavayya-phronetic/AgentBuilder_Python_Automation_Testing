@@ -1,2 +1,0 @@
-Confirmed: redeployment blocked with model validation error for 'Simple Explainer Assistant'.
-Restored original provider 'Bedrock' and model for 'Simple Explainer Assistant'.

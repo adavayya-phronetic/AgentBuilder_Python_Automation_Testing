@@ -1,2 +1,0 @@
-Testing agent 'To-Do List Assistant', card 'SimpleToDoListAgent', provider 'Bedrock', model 'Mistral Large (24.02)'
-Set provider 'Bedrock' with model 'Mistral Large (24.02)', attached tools ['Convert_Language', 'Addition'] to 'SimpleToDoListAgent', and redeployed agent 'To-Do List Assistant'.

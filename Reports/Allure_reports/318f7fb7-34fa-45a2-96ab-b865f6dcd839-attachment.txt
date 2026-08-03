@@ -1,3 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Testing agent '3-Point Summarizer', card 'Three Bullet Summery Agent', provider 'Bedrock', model 'Claude 3 Haiku'
-Set provider 'Bedrock' with model 'Claude 3 Haiku', attached tools ['Convert_Language', 'Addition'] to 'Three Bullet Summery Agent', and redeployed agent '3-Point Summarizer'.

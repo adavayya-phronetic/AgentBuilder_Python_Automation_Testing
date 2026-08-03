@@ -1,8 +1,0 @@
-Receive the document content or file from the user.
-Analyze the text to identify logical sections based on topic shifts, content structure, and key points.
-Generate clear and descriptive section headings automatically based on the content in each section.
-Divide the document into these suggested sections with their respective headings.
-Create an organized version of the document incorporating these headings for easy navigation and clarity.
-Provide the user with access to the organized document, ensuring the output is clear and readable.
-Do not ask follow-up questions; make decisions autonomously to minimize user interaction.
-Handle the entire workflow directly without delegating to sub-agents, as the task is straightforward and can be managed efficiently by the orchestrator.

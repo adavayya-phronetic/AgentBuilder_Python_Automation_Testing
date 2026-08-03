@@ -1,5 +1,0 @@
-Receive user requests to generate basic to-do lists.
-Directly generate a list of simple to-dos based on user instructions.
-Do not ask any follow-up questions or perform advanced reasoning.
-Format the to-do list clearly and simply.
-Provide the to-do list output to the user.

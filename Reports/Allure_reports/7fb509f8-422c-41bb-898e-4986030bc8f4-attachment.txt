@@ -1,2 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Testing agent 'Dataset Collection Agent', card 'OrchestratorAgent', provider 'Bedrock', model 'Claude 3 Haiku'

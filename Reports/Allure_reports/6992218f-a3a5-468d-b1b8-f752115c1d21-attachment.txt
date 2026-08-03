@@ -1,3 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Testing agent 'Customer Support Chatbot Agent', card 'EscalationAgent', provider 'Bedrock', model 'qwen.qwen3-vl-235b-a22b'
-Set provider 'Bedrock' with model 'qwen.qwen3-vl-235b-a22b', attached tools ['Convert_Language', 'Addition'] to 'EscalationAgent', and redeployed agent 'Customer Support Chatbot Agent'.

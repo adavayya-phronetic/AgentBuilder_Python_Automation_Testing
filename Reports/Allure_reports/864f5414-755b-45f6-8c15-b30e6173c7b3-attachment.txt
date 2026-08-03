@@ -1,3 +1,0 @@
-Confirmed empty-name validation error for orchestrator of 'Daily Helper Assistant'.
-Confirmed non-alphanumeric name triggers inline error for orchestrator of 'Daily Helper Assistant'.
-Confirmed original name restored cleanly for orchestrator of 'Daily Helper Assistant' with no validation errors.

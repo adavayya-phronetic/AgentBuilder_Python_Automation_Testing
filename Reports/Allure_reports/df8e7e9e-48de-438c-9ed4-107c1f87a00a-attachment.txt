@@ -1,2 +1,0 @@
-Testing agent 'Simple To-Do Assistant', card 'ToDoListOrchestrator', provider 'Bedrock', model 'GLM 4.7 Flash'
-Set provider 'Bedrock' with model 'GLM 4.7 Flash', attached tools ['Convert_Language', 'Addition'] to 'ToDoListOrchestrator', and redeployed agent 'Simple To-Do Assistant'.

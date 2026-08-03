@@ -1,2 +1,0 @@
-Agent: AI Document OCR Agent
-Sub-agent: Document OCR Agent (agent-0)

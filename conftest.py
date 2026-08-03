@@ -32,6 +32,9 @@ def _session_browser(request):
     """Session-scoped browser — one instance per browser type, shared across agent tests."""
     browser_name = request.param
     driver_instance = get_driver(browser_name)
+    # Stashed on the instance so a later crash can be recovered with the
+    # same browser — see _recover_dead_driver().
+    driver_instance._test_browser_name = browser_name
     driver_instance.get(config.url)
     yield driver_instance
     _quit_driver(driver_instance)
@@ -44,6 +47,65 @@ def logged_in_driver(_session_browser):
     LandingPage(_session_browser).click_get_started()
     LoginPage(_session_browser).login(config.username, config.password)
     yield _session_browser
+
+
+def _is_driver_alive(driver_instance):
+    try:
+        _ = driver_instance.current_url
+        return True
+    except Exception:
+        # Deliberately broad: a dead session shows up as InvalidSessionIdException
+        # when chromedriver itself is still running, but as a raw connection
+        # error (e.g. urllib3.MaxRetryError) when the chromedriver process
+        # itself is gone — neither is a case worth distinguishing here, since
+        # either way this driver can't be used and needs recovering.
+        return False
+
+
+def _recover_dead_driver(driver_instance):
+    """Recreates the browser and logs back in, then rewires driver_instance's
+    connection internals (command_executor/session_id/caps) to point at the
+    new session. Every reference already held to this same object — page
+    objects, the cached session-scoped fixture itself — starts working
+    through the new session transparently; nothing else has to change.
+
+    Chrome/chromedriver crashes mid-suite have repeatedly taken down every
+    remaining test in the file (and every other file after it, since
+    logged_in_driver is session-scoped and shared across the whole pytest
+    run) rather than just the one test that hit the crash. This can't
+    prevent the crash, but it stops one crash from cascading into
+    everything downstream of it.
+    """
+    browser_name = getattr(driver_instance, "_test_browser_name", "chrome")
+    print(f"Detected a dead '{browser_name}' session; recreating it and logging back in...")
+
+    new_driver = get_driver(browser_name)
+    new_driver.get(config.url)
+    LandingPage(new_driver).open_page()
+    LandingPage(new_driver).click_get_started()
+    LoginPage(new_driver).login(config.username, config.password)
+
+    driver_instance.command_executor = new_driver.command_executor
+    driver_instance.session_id = new_driver.session_id
+    driver_instance.caps = new_driver.caps
+    print("Recovered: subsequent tests will use the freshly logged-in session.")
+
+
+@pytest.fixture(autouse=True)
+def _recover_shared_session_if_dead(request):
+    """Runs before every test, before its own body. If the test uses the
+    shared logged_in_driver and that session has already died (from a
+    crash during an earlier test), recreates and re-logs-in transparently
+    so this test — and everything after it — gets a working browser
+    instead of inheriting a permanently dead one. The test whose crash
+    actually caused the dead session already failed and stays failed;
+    this only protects everything downstream of it.
+    """
+    if "logged_in_driver" not in request.fixturenames:
+        return
+    driver_instance = request.getfixturevalue("logged_in_driver")
+    if not _is_driver_alive(driver_instance):
+        _recover_dead_driver(driver_instance)
 
 
 def _capture_test_artifacts(driver_instance, request):
@@ -156,7 +218,7 @@ def _quit_driver(driver_instance, timeout=30):
             print(f"Failed to force kill driver process tree: {e}")
 
 
-_FILE_ORDER = ["test_login", "test_agent_creation", "test_agent_config", "test_validation"]
+_FILE_ORDER = ["test_login", "test_agent_buildpage"]
 
 
 def pytest_collection_modifyitems(items):

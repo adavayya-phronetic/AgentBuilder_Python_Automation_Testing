@@ -1,2 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Confirmed empty-instructions validation error for sub-agent 'UserPreferenceAgent' of 'AI Travel Agent'.

@@ -1,2 +1,0 @@
-Full name : 'Daily Helper Assistant'
-Search term: 'Assistant'

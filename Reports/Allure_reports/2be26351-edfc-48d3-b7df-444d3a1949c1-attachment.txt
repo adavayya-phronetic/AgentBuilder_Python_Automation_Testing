@@ -1,5 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Step 1 OK: opened Chat for agent 'Doc Organizer'.
-Step 2 OK: message sent and agent responded at https://chat.phronetic.ai/CjfLqNrPau06Oflx/chat/953cc329116446798679026de15a48bb
-Step 3 OK: new chat opened at https://chat.phronetic.ai/CjfLqNrPau06Oflx/chat?newchat=true
-Step 4 OK: 'sample_test.pdf' uploaded and agent responded with a summary.

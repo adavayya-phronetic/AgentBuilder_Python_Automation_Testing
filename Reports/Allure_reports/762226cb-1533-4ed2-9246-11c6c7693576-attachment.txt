@@ -1,4 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Confirmed empty-instructions validation error for orchestrator agent of 'Triple Bullet Summarizer'.
-Confirmed whitespace-only instructions are rejected for orchestrator agent of 'Triple Bullet Summarizer'.
-Confirmed orchestrator agent of 'Triple Bullet Summarizer' redeploys successfully once valid instructions are restored.

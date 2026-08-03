@@ -1,2 +1,0 @@
-Confirmed: redeployment blocked with model validation error for 'Document Section Organizer'.
-Restored original provider 'Bedrock' and model for 'Document Section Organizer'.

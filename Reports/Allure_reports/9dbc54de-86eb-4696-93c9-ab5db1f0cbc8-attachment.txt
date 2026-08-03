@@ -1,3 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Testing agent 'Dataset Collection Agent', card 'ImageProcessorAgent', provider 'Bedrock', model 'Kimi K2.5'
-Set provider 'Bedrock' with model 'Kimi K2.5', attached tools ['Convert_Language', 'Addition'] to 'ImageProcessorAgent', and redeployed agent 'Dataset Collection Agent'.

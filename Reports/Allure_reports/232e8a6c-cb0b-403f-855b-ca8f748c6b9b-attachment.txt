@@ -1,4 +1,0 @@
-Agent: TitleGen Assistant
-Card: Title Generator Orchestrator
-Provider: Bedrock
-Model: Claude Haiku 4.5

@@ -1,3 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Testing agent 'Dataset Collection Agent', card 'ImageProcessorAgent', provider 'Bedrock', model 'qwen.qwen3-next-80b-a3b'
-Set provider 'Bedrock' with model 'qwen.qwen3-next-80b-a3b', attached tools ['Convert_Language', 'Addition'] to 'ImageProcessorAgent', and redeployed agent 'Dataset Collection Agent'.

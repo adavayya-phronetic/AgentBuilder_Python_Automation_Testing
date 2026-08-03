@@ -1,3 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Created tool 'QA_Automation_Tool_20260714161551'.
-Confirmed non-.py upload was rejected for tool 'QA_Automation_Tool_20260714161551'.

@@ -1,1 +1,0 @@
-https://auth.phronetic.ai/login?client_id=agent-builder&redirect_uri=https%3A%2F%2Fagent-builder.phronetic.ai%2Fauth%2Fcallback&code_challenge=d5x1uwewKZJaba6tX0cgo9wYh2SOl9h9NSoL3DF8gP8

@@ -1,3 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Agent URL: https://agent-builder.phronetic.ai/build-agent/configure
-Failed to capture test artifacts: HTTPConnectionPool(host='localhost', port=60915): Max retries exceeded with url: /session/d5a8ee7cca1131f0be689f8c8f1c35fc/screenshot (Caused by NewConnectionError("HTTPConnection(host='localhost', port=60915): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))

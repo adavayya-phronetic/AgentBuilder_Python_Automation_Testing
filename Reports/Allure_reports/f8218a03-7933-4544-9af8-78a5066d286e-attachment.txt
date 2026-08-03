@@ -1,2 +1,0 @@
-Agent: Dataset Collection Agent
-Sub-agent: ImageProcessorAgent (agent-1)

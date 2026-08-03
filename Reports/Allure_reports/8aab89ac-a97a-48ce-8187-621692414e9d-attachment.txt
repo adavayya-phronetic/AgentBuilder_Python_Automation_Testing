@@ -1,2 +1,0 @@
-Testing agent 'Daily Helper Assistant', card 'EverydayAssistant', provider 'Bedrock', model 'qwen.qwen3-next-80b-a3b'
-Set provider 'Bedrock' with model 'qwen.qwen3-next-80b-a3b', attached tools ['Convert_Language', 'Addition'] to 'EverydayAssistant', and redeployed agent 'Daily Helper Assistant'.

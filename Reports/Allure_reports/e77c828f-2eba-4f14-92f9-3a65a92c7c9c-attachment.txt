@@ -1,2 +1,0 @@
-Testing agent 'Simple Explainer Assistant', card 'Educational Explainer Orchestrator', provider 'Bedrock', model 'google.gemma-3-12b-it'
-Set provider 'Bedrock' with model 'google.gemma-3-12b-it', attached tools ['Convert_Language', 'Addition'] to 'Educational Explainer Orchestrator', and redeployed agent 'Simple Explainer Assistant'.

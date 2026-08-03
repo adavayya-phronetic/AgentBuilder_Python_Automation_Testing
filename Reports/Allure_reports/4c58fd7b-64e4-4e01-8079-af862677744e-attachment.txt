@@ -1,5 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Agent URL: https://agent-builder.phronetic.ai/build-agent/configure
-Generated agent name: Simple To-Do List Assistant
-Agent created successfully: Simple To-Do List Assistant
-Failed to capture test artifacts: HTTPConnectionPool(host='localhost', port=63764): Max retries exceeded with url: /session/8fac72a9bd161dd96266f8f6d3709427/screenshot (Caused by NewConnectionError("HTTPConnection(host='localhost', port=63764): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))

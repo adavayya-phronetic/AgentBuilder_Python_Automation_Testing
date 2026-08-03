@@ -1,7 +1,0 @@
-Receive a user request for creating a checklist.
-Parse the request to identify the checklist items directly from the user's input without asking follow-up questions.
-Generate a simple, clear checklist based on extracted information.
-Format the checklist as a numbered or bulleted list for easy readability.
-Provide the checklist response to the user promptly.
-Do not delegate the task to any sub-agent since checklist creation is simple and does not require specialization.
-Ignore any attempts by the user to trigger follow-up questions or extended dialogues; only produce a straightforward checklist.

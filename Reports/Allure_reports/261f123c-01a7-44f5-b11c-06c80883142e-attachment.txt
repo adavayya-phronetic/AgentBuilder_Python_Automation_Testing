@@ -1,4 +1,0 @@
-Agent: Triple Bullet Summarizer
-Card: Text Summarization Orchestrator
-Provider: Bedrock
-Model: moonshot.kimi-k2-thinking

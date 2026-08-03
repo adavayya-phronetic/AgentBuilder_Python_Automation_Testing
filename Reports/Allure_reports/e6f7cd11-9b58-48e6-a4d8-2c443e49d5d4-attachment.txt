@@ -1,3 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Testing agent 'AI Travel Agent', card 'FlightOptionsAgent', provider 'Bedrock', model 'google.gemma-3-4b-it'
-Set provider 'Bedrock' with model 'google.gemma-3-4b-it', attached tools ['Convert_Language', 'Addition'] to 'FlightOptionsAgent', and redeployed agent 'AI Travel Agent'.

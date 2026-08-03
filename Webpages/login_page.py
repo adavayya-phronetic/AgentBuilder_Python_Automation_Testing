@@ -51,6 +51,19 @@ class LoginPage:
             "//a[normalize-space()='Sign up']"
         )
 
+        # An unverified-but-otherwise-correct login redirects to a
+        # dedicated /verify-email page (not an inline error on the login
+        # form itself) with this message and a code-entry form.
+        self.unverified_email_message = (
+            By.XPATH,
+            "//*[contains(text(),'Your email is not verified')]"
+        )
+
+        self.verify_email_button = (
+            By.XPATH,
+            "//button[normalize-space()='Verify email']"
+        )
+
     @allure.step("Submit login form as {user}")
     def login(self, user, pwd):
         print("Current URL:", self.driver.current_url)
@@ -69,6 +82,26 @@ class LoginPage:
 
     def is_on_login_page(self):
         return "/auth" in self.driver.current_url
+
+    def is_on_verify_email_page(self):
+        return "/verify-email" in self.driver.current_url
+
+    def wait_for_verify_email_redirect(self, timeout=20):
+        """Waits for the post-login redirect to the /verify-email page to
+        complete. Checking is_on_verify_email_page() right after login()
+        returns is unreliable — the redirect takes a moment, so a raw
+        check fires before the URL has actually changed."""
+        WebDriverWait(self.driver, timeout).until(
+            EC.url_contains("/verify-email")
+        )
+
+    def get_unverified_email_message(self, timeout=10):
+        try:
+            return WebDriverWait(self.driver, timeout).until(
+                EC.visibility_of_element_located(self.unverified_email_message)
+            ).text
+        except TimeoutException:
+            return None
 
     def wait_for_login_success(self, timeout=20):
         """Waits for the post-login redirect to finish, using the

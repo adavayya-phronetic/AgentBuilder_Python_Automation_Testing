@@ -1,2 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Note: 'Tool Created Successfully' toast was not observed for 'QA_Automation_Tool_20260714162224' (timing-dependent, non-fatal).

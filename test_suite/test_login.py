@@ -8,33 +8,6 @@ from Utility.allure_helpers import attach_step_screenshot
 
 
 @allure.feature("Authentication")
-@allure.story("Login / Logout")
-@allure.title("TC_Login_01 — Successful login with valid email and password")
-@allure.severity(allure.severity_level.CRITICAL)
-@pytest.mark.login
-def test_login_logout(driver):
-
-    with allure.step("Open the application and reach the login page"):
-        landing_page = LandingPage(driver)
-        landing_page.open_page()
-        landing_page.click_get_started()
-        attach_step_screenshot(driver, "Reached login page")
-
-    with allure.step("Log in with valid credentials"):
-        login_page = LoginPage(driver)
-        login_page.login(config.username, config.password)
-        login_page.wait_for_login_success()
-
-        assert not login_page.is_on_login_page(), "User should be redirected to the dashboard after login"
-        attach_step_screenshot(driver, "Logged in")
-
-    with allure.step("Log out via user menu"):
-        dashboard = DashboardPage(driver)
-        dashboard.logout()
-        attach_step_screenshot(driver, "Logged out")
-
-
-@allure.feature("Authentication")
 @allure.story("Login Validation")
 @allure.title("TC_Login_02 — Login fails with incorrect email, correct password")
 @allure.severity(allure.severity_level.CRITICAL)
@@ -323,39 +296,6 @@ def test_email_with_spaces(driver):
 
 
 @allure.feature("Authentication")
-@allure.story("Login Validation")
-@allure.title("TC_Login_11 — Email is case-insensitive")
-@allure.severity(allure.severity_level.NORMAL)
-@pytest.mark.login
-def test_case_insensitive_email_login(driver):
-
-    with allure.step("Open the application and reach the login page"):
-        landing_page = LandingPage(driver)
-        landing_page.open_page()
-        landing_page.click_get_started()
-        attach_step_screenshot(driver, "Reached login page")
-
-    with allure.step("Log in with the registered email in all-uppercase"):
-        login_page = LoginPage(driver)
-        mixed_case_email = config.username.upper()
-        allure.attach(mixed_case_email, name="Mixed-case email used", attachment_type=allure.attachment_type.TEXT)
-
-        login_page.login(mixed_case_email, config.password)
-        login_page.wait_for_login_success()
-
-        assert not login_page.is_on_login_page(), (
-            "Login should succeed regardless of email case"
-        )
-        print(f"Logged in successfully using mixed-case email '{mixed_case_email}'.")
-        attach_step_screenshot(driver, "Logged in with mixed-case email")
-
-    with allure.step("Log out via user menu"):
-        dashboard = DashboardPage(driver)
-        dashboard.logout()
-        attach_step_screenshot(driver, "Logged out")
-
-
-@allure.feature("Authentication")
 @allure.story("Login Navigation")
 @allure.title("TC_Login_12 — 'Forgot password?' link navigates to the Forgot Password page")
 @allure.severity(allure.severity_level.NORMAL)
@@ -404,6 +344,78 @@ def test_signup_navigation(driver):
 
 
 @allure.feature("Authentication")
+@allure.story("Security")
+@allure.title("TC_Login_15 — SQL injection input is handled safely")
+@allure.severity(allure.severity_level.CRITICAL)
+@pytest.mark.login
+def test_sql_injection_login_input(driver):
+
+    with allure.step("Open the application and reach the login page"):
+        landing_page = LandingPage(driver)
+        landing_page.open_page()
+        landing_page.click_get_started()
+        attach_step_screenshot(driver, "Reached login page")
+
+    with allure.step("Enter a SQL-injection-style payload in both fields, then click Sign in"):
+        login_page = LoginPage(driver)
+        login_page.login("' OR '1'='1", "' OR '1'='1")
+        attach_step_screenshot(driver, "Submitted SQL injection payload")
+
+    with allure.step("Verify the payload is rejected safely with no DB error exposed"):
+        # The payload isn't a valid email address, so the browser's own
+        # input[type=email] validation blocks the request before it ever
+        # reaches the backend — the strongest possible form of "input
+        # sanitized, no DB error exposed" (the query never runs at all).
+        validation_message = login_page.get_email_validation_message()
+        page_text = driver.find_element("tag name", "body").text
+
+        assert "@" in validation_message and "missing" in validation_message, (
+            f"Expected the SQL injection payload to be rejected by native email validation, "
+            f"got {validation_message!r}"
+        )
+        assert not any(k in page_text for k in ("SQL", "syntax", "database", "Traceback", "Exception")), (
+            "Page must not leak SQL/database error details"
+        )
+        assert login_page.is_on_login_page(), "User should not be logged in with a SQL injection payload"
+
+        print("SQL injection payload validation message:", validation_message)
+        attach_step_screenshot(driver, "SQL injection payload rejected safely")
+
+
+@allure.feature("Authentication")
+@allure.story("Login Validation")
+@allure.title("TC_Login_11 — Email is case-insensitive")
+@allure.severity(allure.severity_level.NORMAL)
+@pytest.mark.login
+def test_case_insensitive_email_login(driver):
+
+    with allure.step("Open the application and reach the login page"):
+        landing_page = LandingPage(driver)
+        landing_page.open_page()
+        landing_page.click_get_started()
+        attach_step_screenshot(driver, "Reached login page")
+
+    with allure.step("Log in with the registered email in all-uppercase"):
+        login_page = LoginPage(driver)
+        mixed_case_email = config.username.upper()
+        allure.attach(mixed_case_email, name="Mixed-case email used", attachment_type=allure.attachment_type.TEXT)
+
+        login_page.login(mixed_case_email, config.password)
+        login_page.wait_for_login_success()
+
+        assert not login_page.is_on_login_page(), (
+            "Login should succeed regardless of email case"
+        )
+        print(f"Logged in successfully using mixed-case email '{mixed_case_email}'.")
+        attach_step_screenshot(driver, "Logged in with mixed-case email")
+
+    with allure.step("Log out via user menu"):
+        dashboard = DashboardPage(driver)
+        dashboard.logout()
+        attach_step_screenshot(driver, "Logged out")
+
+
+@allure.feature("Authentication")
 @allure.story("Login / Logout")
 @allure.title("TC_Login_14 — Enter key submits the login form")
 @allure.severity(allure.severity_level.NORMAL)
@@ -445,11 +457,11 @@ def test_enter_key_submits_login(driver):
 
 
 @allure.feature("Authentication")
-@allure.story("Security")
-@allure.title("TC_Login_15 — SQL injection input is handled safely")
+@allure.story("Login / Logout")
+@allure.title("TC_Login_01 — Successful login with valid email and password")
 @allure.severity(allure.severity_level.CRITICAL)
 @pytest.mark.login
-def test_sql_injection_login_input(driver):
+def test_login_logout(driver):
 
     with allure.step("Open the application and reach the login page"):
         landing_page = LandingPage(driver)
@@ -457,27 +469,61 @@ def test_sql_injection_login_input(driver):
         landing_page.click_get_started()
         attach_step_screenshot(driver, "Reached login page")
 
-    with allure.step("Enter a SQL-injection-style payload in both fields, then click Sign in"):
+    with allure.step("Log in with valid credentials"):
         login_page = LoginPage(driver)
-        login_page.login("' OR '1'='1", "' OR '1'='1")
-        attach_step_screenshot(driver, "Submitted SQL injection payload")
+        login_page.login(config.username, config.password)
+        login_page.wait_for_login_success()
 
-    with allure.step("Verify the payload is rejected safely with no DB error exposed"):
-        # The payload isn't a valid email address, so the browser's own
-        # input[type=email] validation blocks the request before it ever
-        # reaches the backend — the strongest possible form of "input
-        # sanitized, no DB error exposed" (the query never runs at all).
-        validation_message = login_page.get_email_validation_message()
-        page_text = driver.find_element("tag name", "body").text
+        assert not login_page.is_on_login_page(), "User should be redirected to the dashboard after login"
+        attach_step_screenshot(driver, "Logged in, dashboard loaded")
 
-        assert "@" in validation_message and "missing" in validation_message, (
-            f"Expected the SQL injection payload to be rejected by native email validation, "
-            f"got {validation_message!r}"
+    with allure.step("Log out via user menu"):
+        dashboard = DashboardPage(driver)
+        dashboard.logout()
+        attach_step_screenshot(driver, "Logged out")
+
+
+@allure.feature("Authentication")
+@allure.story("Email Verification")
+@allure.title("TC_SignIn_Unverified_01 — Unverified users are blocked from sign-in and prompted to verify")
+@allure.severity(allure.severity_level.CRITICAL)
+@pytest.mark.login
+def test_unverified_user_blocked_from_signin(driver):
+    """
+    Verify that unverified users are blocked from sign-in and prompted to
+    complete email verification.
+
+    An unverified-but-otherwise-correct login doesn't show an inline error
+    on the login form itself — it redirects to a dedicated /verify-email
+    page with the message and a code-entry form (confirmed live).
+    """
+    unverified_email = "adavayya+2@phronetic.ai"
+
+    with allure.step("Open the application and reach the login page"):
+        landing_page = LandingPage(driver)
+        landing_page.open_page()
+        landing_page.click_get_started()
+        attach_step_screenshot(driver, "Reached login page")
+
+    with allure.step(f"Sign in as unverified user '{unverified_email}' with a valid password"):
+        login_page = LoginPage(driver)
+        login_page.login(unverified_email, config.password)
+        attach_step_screenshot(driver, "Submitted unverified user credentials")
+
+    with allure.step("Verify the user is not logged in and is prompted to verify their email"):
+        login_page.wait_for_verify_email_redirect()
+        assert login_page.is_on_verify_email_page(), (
+            "User should be redirected to the email verification page, not logged in"
         )
-        assert not any(k in page_text for k in ("SQL", "syntax", "database", "Traceback", "Exception")), (
-            "Page must not leak SQL/database error details"
-        )
-        assert login_page.is_on_login_page(), "User should not be logged in with a SQL injection payload"
 
-        print("SQL injection payload validation message:", validation_message)
-        attach_step_screenshot(driver, "SQL injection payload rejected safely")
+        message = login_page.get_unverified_email_message()
+        assert message and "not verified" in message.lower(), (
+            f"Expected an 'email is not verified' message, got {message!r}"
+        )
+
+        assert login_page.driver.find_elements(*login_page.verify_email_button), (
+            "Expected a 'Verify email' option to let the user complete verification"
+        )
+
+        print("Unverified email message:", message)
+        attach_step_screenshot(driver, "Verify email page shown")

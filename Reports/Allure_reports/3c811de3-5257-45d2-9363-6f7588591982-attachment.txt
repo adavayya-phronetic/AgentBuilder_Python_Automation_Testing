@@ -1,3 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Confirmed: redeployment blocked with model validation error for 'Checklist Maker'.
-Restored original provider 'Bedrock' and model for 'Checklist Maker'.

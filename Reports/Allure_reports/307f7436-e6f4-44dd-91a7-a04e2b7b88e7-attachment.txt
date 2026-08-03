@@ -1,4 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Confirmed empty-instructions validation error for orchestrator of 'Tone Rewriter 20260709173457'.
-Confirmed whitespace-only instructions are rejected for orchestrator of 'Tone Rewriter 20260709173457'.
-Confirmed orchestrator of 'Tone Rewriter 20260709173457' redeploys successfully once valid instructions are restored.

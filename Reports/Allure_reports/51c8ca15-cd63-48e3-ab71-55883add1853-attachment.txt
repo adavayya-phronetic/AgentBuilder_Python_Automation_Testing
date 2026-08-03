@@ -1,3 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Testing agent 'Three-Point Text Summarizer', card 'Text Summarizer Orchestrator', provider 'Bedrock', model 'qwen.qwen3-vl-235b-a22b'
-Set provider 'Bedrock' with model 'qwen.qwen3-vl-235b-a22b', attached tools ['Convert_Language', 'Addition'] to 'Text Summarizer Orchestrator', and redeployed agent 'Three-Point Text Summarizer'.

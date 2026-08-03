@@ -1,4 +1,0 @@
-Agent: Simple To-Do List Assistant
-Card: ToDoListGenerator
-Provider: Bedrock
-Model: Qwen3 Coder 30B A3B Instruct

@@ -1,2 +1,0 @@
-Testing agent 'Plain Language Explainer', card 'SimpleLanguageEducationAssistant', provider 'Bedrock', model 'GLM 4.7 Flash'
-Set provider 'Bedrock' with model 'GLM 4.7 Flash', attached tools ['Convert_Language', 'Addition'] to 'SimpleLanguageEducationAssistant', and redeployed agent 'Plain Language Explainer'.

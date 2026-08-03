@@ -1,4 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Agent URL: https://agent-builder.phronetic.ai/build-agent/configure
-Generated agent name: Job Interview Prep Assistant
-Agent created successfully: Job Interview Prep Assistant

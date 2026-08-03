@@ -1,2 +1,0 @@
-Testing agent 'Checklist Creator', card 'Checklist Creator Orchestrator', provider 'Bedrock', model 'GLM 4.7 Flash'
-Set provider 'Bedrock' with model 'GLM 4.7 Flash', attached tools ['Convert_Language', 'Addition'] to 'Checklist Creator Orchestrator', and redeployed agent 'Checklist Creator'.

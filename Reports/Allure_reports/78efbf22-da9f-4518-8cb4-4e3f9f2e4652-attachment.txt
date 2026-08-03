@@ -1,3 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Testing agent 'OCR Agent', card 'DocumentTextExtractionOrchestrator', provider 'Bedrock', model 'Claude 3 Haiku'
-Set provider 'Bedrock' with model 'Claude 3 Haiku', attached tools ['Convert_Language', 'Addition'] to 'DocumentTextExtractionOrchestrator', and redeployed agent 'OCR Agent'.

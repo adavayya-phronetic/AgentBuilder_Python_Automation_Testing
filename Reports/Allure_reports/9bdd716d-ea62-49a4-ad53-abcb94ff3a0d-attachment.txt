@@ -1,4 +1,0 @@
-Agent: Daily Helper Assistant
-Card: EverydayAssistant
-Provider: Bedrock
-Model: qwen.qwen3-next-80b-a3b

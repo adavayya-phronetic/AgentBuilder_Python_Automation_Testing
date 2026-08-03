@@ -1,4 +1,0 @@
-Agent: 3-Point Summarizer
-Card: Three Bullet Summery Agent
-Provider: Bedrock
-Model: mistral.ministral-3-3b-instruct

@@ -1,3 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Invalid password error message: Incorrect email or password
-Failed to capture test artifacts: HTTPConnectionPool(host='localhost', port=57446): Max retries exceeded with url: /session/1b988fb6a4683aeb39d392c0945e137c/screenshot (Caused by NewConnectionError("HTTPConnection(host='localhost', port=57446): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))

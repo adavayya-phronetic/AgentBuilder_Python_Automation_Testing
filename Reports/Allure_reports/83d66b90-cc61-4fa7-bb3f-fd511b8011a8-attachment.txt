@@ -1,4 +1,0 @@
-Agent: Document Organizer
-Card: DocumentOrganizerOrchestrator
-Provider: Bedrock
-Model: nvidia.nemotron-nano-3-30b

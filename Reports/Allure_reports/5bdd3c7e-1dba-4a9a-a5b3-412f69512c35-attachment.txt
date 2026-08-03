@@ -1,2 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Confirmed closing the Instructions dialog without edits preserves content for orchestrator agent of 'AI Travel Agent'.

@@ -1,2 +1,0 @@
-Full name : 'Simple To-Do Maker'
-Search term: 'Maker'

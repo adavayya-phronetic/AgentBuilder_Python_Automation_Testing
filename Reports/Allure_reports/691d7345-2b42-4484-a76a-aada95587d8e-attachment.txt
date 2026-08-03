@@ -1,2 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Set provider 'Bedrock' with model 'DeepSeek v3.2', attached tools ['Convert_Language', 'Addition'] to 'TextSummarizerOrchestrator', and redeployed agent 'Text Summarizer Assistant'.

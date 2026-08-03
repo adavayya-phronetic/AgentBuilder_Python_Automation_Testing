@@ -1,4 +1,0 @@
-Agent: Simple To-Do Maker
-Card: SimpleToDoListAssistant
-Provider: Bedrock
-Model: Kimi K2.5

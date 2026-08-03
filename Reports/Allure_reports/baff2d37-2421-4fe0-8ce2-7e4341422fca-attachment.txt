@@ -1,4 +1,0 @@
-Agent: Three-Point Summarizer
-Card: InvalidName
-Provider: Bedrock
-Model: deepseek.v3-v1:0

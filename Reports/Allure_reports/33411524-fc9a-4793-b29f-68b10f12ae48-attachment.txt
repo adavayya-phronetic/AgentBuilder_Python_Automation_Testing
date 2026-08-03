@@ -1,4 +1,0 @@
-Agent: Title Generator Assistant
-Card: Document Title Generator Orchestrator
-Provider: Bedrock
-Model: Mistral Large 3

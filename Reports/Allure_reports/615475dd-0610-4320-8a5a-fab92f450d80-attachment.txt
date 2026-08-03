@@ -1,4 +1,0 @@
-Agent: To-Do List Assistant
-Card: SimpleToDoListAgent
-Provider: Bedrock
-Model: Qwen3 Coder 480B A35B Instruct

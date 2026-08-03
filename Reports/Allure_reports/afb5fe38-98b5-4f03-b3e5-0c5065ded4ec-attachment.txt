@@ -1,5 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Agent URL: https://agent-builder.phronetic.ai/build-agent/configure
-Generated agent name: DocSection Organizer
-WARNING: Agent 'DocSection Organizer' was created but did not yet appear in the My Agents list (backend indexing lag).
-Failed to capture test artifacts: HTTPConnectionPool(host='localhost', port=65503): Max retries exceeded with url: /session/321cee491e4c540e5a502a7856aa8286/screenshot (Caused by NewConnectionError("HTTPConnection(host='localhost', port=65503): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))

@@ -1,2 +1,0 @@
-Testing agent 'Document Organizer', card 'DocumentOrganizerOrchestrator', provider 'Bedrock', model 'nvidia.nemotron-nano-3-30b'
-Set provider 'Bedrock' with model 'nvidia.nemotron-nano-3-30b', attached tools ['Convert_Language', 'Addition'] to 'DocumentOrganizerOrchestrator', and redeployed agent 'Document Organizer'.

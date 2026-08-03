@@ -1,4 +1,0 @@
-Agent: Simple Explainer Assistant
-Card: Educational Explainer Orchestrator
-Provider: Bedrock
-Model: google.gemma-3-12b-it

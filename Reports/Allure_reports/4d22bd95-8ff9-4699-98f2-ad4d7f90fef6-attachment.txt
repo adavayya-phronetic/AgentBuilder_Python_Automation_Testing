@@ -1,2 +1,0 @@
-Confirmed: redeployment blocked with model validation error for 'Email Drafter'.
-Restored original provider 'Bedrock' and model for 'Email Drafter'.
