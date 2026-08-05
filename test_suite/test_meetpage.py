@@ -1,5 +1,6 @@
 import os
 import random
+from urllib.parse import urlparse
 
 import allure
 import pytest
@@ -23,8 +24,25 @@ def _open_meet_tab_in_new_window(driver):
 
 
 def _open_random_active_agent_meet(driver):
+    # click_my_agents() clicks a "My Agents" nav link that only exists on
+    # the main app shell's own sidebar — but this test shares one browser
+    # session with every other file in a full suite run, and
+    # test_agent_buildpage.py's tests deliberately never reset to /agents
+    # between themselves (they stay on one agent's Build page throughout).
+    # If this test runs right after that file, the shared session can
+    # still be sitting on the Build page's own different sidebar (Build /
+    # Gateway / Analytics / Sessions / Datasets / Eval Dashboard, no "My
+    # Agents" link at all), so click_my_agents() waits forever for a link
+    # that was never going to appear. A hard navigation to /agents works
+    # regardless of whatever page the previous test left the session on.
+    parsed = urlparse(driver.current_url)
+    agents_url = f"{parsed.scheme}://{parsed.netloc}/agents"
+    driver.get(agents_url)
+
     agents_page = MyAgentsPage(driver)
-    agents_page.click_my_agents()
+    agents_page.wait.until(
+        EC.visibility_of_element_located(agents_page.search_input)
+    )
 
     active_agent_names = agents_page.get_active_agent_names()
     assert active_agent_names, "No active agents found in the agent card list"

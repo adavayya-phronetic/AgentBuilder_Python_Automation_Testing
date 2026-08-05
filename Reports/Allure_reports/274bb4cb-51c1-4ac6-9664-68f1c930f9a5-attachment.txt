@@ -1,2 +1,0 @@
-Current URL: https://auth.phronetic.ai/login?client_id=agent-builder&redirect_uri=https%3A%2F%2Fagent-builder.phronetic.ai%2Fauth%2Fcallback&code_challenge=F3NNoyoTon1qDycztkeoks1ogjOM6fOQD1Ks_ut2E9Q
-Unverified email message: Your email is not verified. A verification code has been sent to your email.

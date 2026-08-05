@@ -83,7 +83,7 @@ def test_create_agent(logged_in_driver):
         agents_page = MyAgentsPage(driver)
 
         agents_page.enter_prompt(
-            "Create an assistant that explains Python concepts for beginners."
+            "Create an assistant that helps small business owners write business proposals."
             "Do not ask follow-up questions,just do the basic configuration."
         )
 

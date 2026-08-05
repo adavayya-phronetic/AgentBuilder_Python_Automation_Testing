@@ -45,7 +45,16 @@ def logged_in_driver(_session_browser):
     """Logs in once per browser session; yields the driver positioned at the app dashboard."""
     LandingPage(_session_browser).open_page()
     LandingPage(_session_browser).click_get_started()
-    LoginPage(_session_browser).login(config.username, config.password)
+    login_page = LoginPage(_session_browser)
+    login_page.login(config.username, config.password)
+    # Without this wait, the driver can still be sitting on auth.phronetic.ai
+    # (the OAuth callback redirect back to the app hasn't landed yet) when a
+    # test's first action hard-navigates via urlparse(current_url) — that
+    # then rebuilds the target URL on the AUTH host instead of the app host,
+    # producing auth.phronetic.ai's own "Access Blocked: Missing required
+    # parameters (client_id or redirect_uri)" page. Confirmed live: this is
+    # exactly what was failing the first few dashboard tests in a run.
+    login_page.wait_for_login_success()
     yield _session_browser
 
 
@@ -83,7 +92,9 @@ def _recover_dead_driver(driver_instance):
     new_driver.get(config.url)
     LandingPage(new_driver).open_page()
     LandingPage(new_driver).click_get_started()
-    LoginPage(new_driver).login(config.username, config.password)
+    new_login_page = LoginPage(new_driver)
+    new_login_page.login(config.username, config.password)
+    new_login_page.wait_for_login_success()
 
     driver_instance.command_executor = new_driver.command_executor
     driver_instance.session_id = new_driver.session_id

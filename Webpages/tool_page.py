@@ -66,8 +66,15 @@ class ToolPage:
             "//button[contains(@class,'peer') and contains(@class,'inline-flex')]"
         )
 
-        # The header *name* field defaults to a fixed 'X-API-KEY' and is
-        # read-only — only the value is settable.
+        # The header *name* field is now a required, editable input (confirmed
+        # live: submitting with it empty shows an inline "Header name is
+        # required" error) — it is no longer the fixed, read-only 'X-API-KEY'
+        # it used to be.
+        self.header_name_input = (
+            By.XPATH,
+            "//label[normalize-space()='Header Name']/following::input[1]"
+        )
+
         self.header_value_input = (
             By.XPATH,
             "//label[normalize-space()='Header Value']/following::input[1]"
@@ -296,6 +303,14 @@ class ToolPage:
         self.wait.until(
             EC.element_to_be_clickable(self.authorization_header_toggle)
         ).click()
+
+    @allure.step("Enter Authorization Header name '{name}'")
+    def enter_header_name(self, name):
+        field = self.wait.until(
+            EC.element_to_be_clickable(self.header_name_input)
+        )
+        field.clear()
+        field.send_keys(name)
 
     @allure.step("Enter Authorization Header value")
     def enter_header_value(self, value):

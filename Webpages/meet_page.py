@@ -289,8 +289,30 @@ class MeetPage:
         # uses the same re-locate-then-JS-click helper as hang_up().
         self._click(self.more_options_button)
 
+        # Confirmed reproducible right after Step 3's heavy upload+response
+        # wait: the menu opens, but some items (Chat History, Share Screen)
+        # can still be mid-render at that exact moment and don't show up
+        # within get_more_options_menu_items()'s per-item wait, even though
+        # the same locators find them instantly on a fresh, non-rushed
+        # open. A short settle pause here — same pragmatic pattern already
+        # used elsewhere in this file after heavy transitions — lets the
+        # full menu finish rendering before anything reads its contents.
+        time.sleep(2)
+
     def get_more_options_menu_items(self, timeout=10):
-        """Returns the visible text of every item currently shown in the More options menu."""
+        """Returns the visible text of every item currently shown in the More options menu.
+
+        Confirmed reproducible with the Chat panel open (i.e. right after
+        Step 3's upload+response, not on a fresh join): the first and last
+        items (Chat History, Share Screen) can be present in the DOM but
+        scrolled out of the popup's visible area rather than genuinely
+        absent — the Chat panel taking up screen space leaves less room
+        for the popup, unlike a fresh join with no panels open. Checking
+        visibility_of_element_located alone assumes it's already in view;
+        this waits for presence first and scrolls each item into view
+        before reading it, the same pattern used for scrolled screenshots
+        elsewhere in this suite.
+        """
         items = []
         for locator in (
             self.chat_history_menu_item,
@@ -301,7 +323,13 @@ class MeetPage:
         ):
             try:
                 el = WebDriverWait(self.driver, timeout).until(
-                    EC.visibility_of_element_located(locator)
+                    EC.presence_of_element_located(locator)
+                )
+                self.driver.execute_script(
+                    "arguments[0].scrollIntoView({block: 'center'});", el
+                )
+                WebDriverWait(self.driver, timeout).until(
+                    lambda d, e=el: e.is_displayed()
                 )
                 items.append(el.text.strip())
             except TimeoutException:

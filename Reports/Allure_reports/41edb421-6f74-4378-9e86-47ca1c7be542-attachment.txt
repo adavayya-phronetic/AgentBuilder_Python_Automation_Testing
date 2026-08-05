@@ -1,0 +1,4 @@
+Created MCP-connected tool 'QA_Automation_Tool_MCP_FindEmail'.
+Functions found in Test your tool panel: ['get_configuration_url', 'gmail_find_email']
+Skipping 'get_configuration_url': no input parameters to test.
+Test output for gmail_find_email(['output_hint', 'query', 'paging_token']): '{}'

@@ -257,9 +257,14 @@ def test_create_tool_via_mcp_url(logged_in_driver, request):
     1. Create a tool from an external MCP server (a real, live Zapier/Gmail
        connection) via the 'External MCP URL' build method, instead of a
        prompt or file upload.
-    2. Enable the Authorization Header (its name is fixed to 'X-API-KEY',
-       read-only — only the value is settable) and set its value to the
-       connection token.
+    2. Enable the Authorization Header and set both its name ('Authorization')
+       and its value (the connection token) — the header name field is now a
+       required, editable input that accepts any value (confirmed live with
+       'My-Custom-Header', 'x-api-key', and 'Authorization' — all created
+       successfully). A one-off "An Error Occured While Creating The Tool"
+       failure was seen during investigation but didn't reproduce on retry,
+       so it was a transient backend hiccup, not a header-name validation
+       rule.
     3. Enter the full MCP URL with the token embedded as the 'token' query
        parameter's value — confirmed: submitting the URL without the token
        appended fails server-side with 'Lambda function not found for
@@ -293,6 +298,7 @@ def test_create_tool_via_mcp_url(logged_in_driver, request):
 
         tool_page.enter_tool_name(tool_name)
         tool_page.enable_authorization_header()
+        tool_page.enter_header_name("Authorization")
         tool_page.enter_header_value(secrets.zapier_mcp_token)
         tool_page.click_save_header()
         attach_step_screenshot(driver, "Authorization header saved")
