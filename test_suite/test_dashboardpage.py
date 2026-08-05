@@ -386,16 +386,20 @@ def test_credit_usage_graph_updates_for_selected_date(logged_in_driver):
         attach_step_screenshot(driver, "Date filter applied")
 
     with allure.step("Verify the Credit Usage graph reflects only the selected date"):
-        WebDriverWait(driver, 15).until(
-            lambda d: dashboard.get_credit_usage_amount_text() != amount_before
+        # A truly empty date range renders no rupee amount at all in the
+        # current UI — just a "No spend in this period" empty-state message
+        # (confirmed live) — so this filtered-to-no-data scenario is only
+        # ever going to land in that empty state, never a changed amount
+        # string. Same reasoning as test_session_performance_empty_state's
+        # falsy-0 fix: assert the actual state reached, not a text diff that
+        # this specific filter can never produce.
+        assert dashboard.is_credit_usage_empty_state(timeout=15), (
+            "Expected the Credit Usage widget to show its empty state "
+            "('No spend in this period') for a date range with no usage data"
         )
-        amount_after = dashboard.get_credit_usage_amount_text()
-        assert amount_after != amount_before, (
-            f"Expected Credit Usage amount to change from {amount_before!r} for the "
-            f"filtered date, but it stayed the same"
-        )
-        print(f"Credit Usage amount for the filtered date: {amount_after}")
-        attach_step_screenshot(driver, "Credit Usage graph updated")
+        print("Credit Usage graph correctly shows the empty state for the filtered date "
+              f"(amount before filter was {amount_before!r}).")
+        attach_step_screenshot(driver, "Credit Usage graph empty state shown")
 
 
 @allure.feature("Dashboard")

@@ -113,11 +113,13 @@ class DashboardPage:
             "//div[@role='dialog']//button[normalize-space()='Close']"
         )
 
-        # --- Performance & Usage: date/time filter ---
-        self.date_time_filter_button = (
-            By.XPATH,
-            "//button[contains(.,'Pick a date') or contains(.,'date')]"
-        )
+        # --- Activity and Usage (formerly "Performance & Usage"): date/time
+        # filter --- The trigger button's visible text is state-dependent
+        # (confirmed live: it reads 'Default: Last 30 days' before any
+        # filter is applied, then shows the actual picked range afterwards),
+        # so text-matching it is fragile — its stable 'date' id attribute
+        # isn't.
+        self.date_time_filter_button = (By.ID, "date")
 
         self.date_filter_start_input = (
             By.XPATH,
@@ -132,39 +134,56 @@ class DashboardPage:
         self.date_filter_apply_button = (By.XPATH, "//button[normalize-space()='Apply']")
         self.date_filter_clear_button = (By.XPATH, "//button[normalize-space()='Clear']")
 
+        # Renamed from 'Session Performance' to 'Session activity' in a live
+        # UI update (confirmed: the app's "Performance & Usage" section is
+        # now labeled "Activity and Usage", and this widget's own heading
+        # changed to match).
         self.session_performance_heading = (
             By.XPATH,
-            "//*[normalize-space()='Session Performance']"
+            "//*[normalize-space()='Session activity']"
         )
 
         # The heading and its count+unit live in sibling divs within one
         # shared row container — targeting the bold count span directly,
         # rather than the row's combined text, avoids also picking up the
         # unit label ('sessions'/'credits') or the heading text itself.
+        # There's also a *nested* 'justify-between' div directly wrapping
+        # just the heading+subtitle (confirmed live via outerHTML) sitting
+        # between the <p> and the real outer row container that also holds
+        # the count span — a bare ancestor::div[...][1] match lands on that
+        # inner one and finds no count span at all. Requiring 'flex-none'
+        # too (only the outer row has it) disambiguates the two.
         self.session_performance_count = (
             By.XPATH,
-            "//p[normalize-space()='Session Performance']/ancestor::div[contains(@class,'justify-between')][1]"
+            "//p[normalize-space()='Session activity']"
+            "/ancestor::div[contains(@class,'justify-between') and contains(@class,'flex-none')][1]"
             "//span[contains(@class,'font-bold')]"
         )
 
+        # Renamed from 'Credit Usage' to 'Wallet usage' in the same UI update.
         self.credit_usage_heading = (
             By.XPATH,
-            "//*[normalize-space()='Credit Usage']"
+            "//*[normalize-space()='Wallet usage']"
         )
 
-        # Confirmed: Credit Usage's DOM structure changes between its
-        # has-data state (value in a <span>, label separate) and its
-        # empty/zero state (value and label as sibling <p> tags) — a
-        # locator tied to one specific structure breaks in the other.
-        # This instead scopes to the shared card containing both graphs
-        # (identified by its stable layout classes) and takes the first
-        # span/p containing a rupee sign, which holds in both states and
-        # excludes the chart's own SVG axis labels (<tspan>, not
-        # span/p) and the unrelated Wallet balance in the left sidebar.
+        # Scopes to the shared card containing both graphs (identified by its
+        # stable layout classes) and takes the first span/p containing a
+        # rupee sign — excludes the chart's own SVG axis labels (<tspan>,
+        # not span/p) and the unrelated Wallet balance in the left sidebar.
+        # NOTE: in the current UI, this only matches the has-data state — the
+        # no-data/empty state (confirmed live) renders no rupee amount at
+        # all, just a "No spend in this period" message. See
+        # credit_usage_empty_message / is_credit_usage_empty_state() for
+        # that state instead of expecting this locator to resolve there.
         self.credit_usage_amount = (
             By.XPATH,
             "(//div[contains(@class,'xl:flex-row') and contains(@class,'overflow-hidden')]"
             "//*[(self::span or self::p) and contains(text(),'₹')])[1]"
+        )
+
+        self.credit_usage_empty_message = (
+            By.XPATH,
+            "//*[contains(text(),'No spend in this period')]"
         )
 
         # --- Agents & Activity: "View All" link ---
@@ -354,6 +373,14 @@ class DashboardPage:
         return WebDriverWait(self.driver, timeout).until(
             EC.visibility_of_element_located(self.credit_usage_amount)
         ).text.strip()
+
+    def is_credit_usage_empty_state(self, timeout=10):
+        try:
+            return WebDriverWait(self.driver, timeout).until(
+                EC.visibility_of_element_located(self.credit_usage_empty_message)
+            ).is_displayed()
+        except TimeoutException:
+            return False
 
     @allure.step("Click 'View All' in Agents & Activity")
     def click_agents_activity_view_all(self):

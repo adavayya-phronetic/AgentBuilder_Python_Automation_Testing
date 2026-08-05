@@ -405,12 +405,24 @@ class MyAgentsPage:
         results area sits below the fold on the My Agents page, so a
         screenshot taken right after get_card_names() — without this —
         shows the creation prompt box and an empty-looking page instead of
-        whatever the test actually asserted on."""
-        cards = self.driver.find_elements(*self.agent_card_title)
-        if cards:
-            self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", cards[0])
-        else:
-            self.scroll_no_results_message_into_view()
+        whatever the test actually asserted on.
+
+        Same debounce/re-render race as get_card_names() — a search/filter
+        change can re-render the grid between find_elements() and the
+        scrollIntoView call on cards[0], going stale in between (confirmed
+        live: StaleElementReferenceException here right after a search).
+        Retries a couple of times rather than let that one-off race fail
+        the whole call."""
+        for _ in range(3):
+            try:
+                cards = self.driver.find_elements(*self.agent_card_title)
+                if cards:
+                    self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", cards[0])
+                else:
+                    self.scroll_no_results_message_into_view()
+                return
+            except StaleElementReferenceException:
+                continue
 
     def scroll_no_results_message_into_view(self):
         try:

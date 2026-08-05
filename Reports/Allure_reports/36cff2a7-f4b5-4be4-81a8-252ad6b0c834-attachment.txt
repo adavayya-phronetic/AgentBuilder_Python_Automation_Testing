@@ -1,2 +1,0 @@
-Deleting tool 'QA_Automation_Tool_Upload'.
-Confirmed 'QA_Automation_Tool_Upload' was deleted and no longer appears in the list.

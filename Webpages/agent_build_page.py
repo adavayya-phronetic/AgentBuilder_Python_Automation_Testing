@@ -486,10 +486,19 @@ class AgentBuildPage:
     def get_model_provider_options(self):
         """Returns available model provider names from the dropdown."""
         self.wait.until(EC.element_to_be_clickable(self.model_provider_combobox)).click()
-        options = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_all_elements_located((By.XPATH, "//div[@role='option']"))
+        option_locator = (By.XPATH, "//div[@role='option']")
+        WebDriverWait(self.driver, 10).until(
+            EC.presence_of_all_elements_located(option_locator)
         )
-        names = [o.text.strip() for o in options if o.text.strip()]
+        # The option elements can be present in the DOM as empty placeholders
+        # a tick before their text renders (confirmed live: reading .text
+        # immediately after presence_of_all_elements_located sometimes
+        # returned an empty list even though the dropdown had real options
+        # a moment later) — wait for at least one to actually have text
+        # before reading them all, rather than trusting the first snapshot.
+        names = WebDriverWait(self.driver, 10).until(
+            lambda d: [o.text.strip() for o in d.find_elements(*option_locator) if o.text.strip()]
+        )
         ActionChains(self.driver).send_keys(Keys.ESCAPE).perform()
         return names
 
@@ -865,10 +874,18 @@ class AgentBuildPage:
             return False
 
     def get_agent_card_names(self):
-        # MCP tool nodes (data-id contains "mcp") sit on the graph alongside
-        # agent/orchestrator nodes but don't open the Model/Tools panel, so
-        # they're excluded. An agent node's display name is the first line
-        # of its text (name, description, model, role stacked underneath).
+        # MCP tool nodes (data-id contains "mcp") and the Knowledge Base node
+        # (data-id == "knowledge-base", confirmed live — added to the graph
+        # once at least one file has been uploaded to the agent's knowledge
+        # base) sit on the graph alongside agent/orchestrator nodes but don't
+        # open the Model/Tools panel, so they're excluded. Missing this
+        # exclusion was a real, reproducible bug: callers that
+        # random.choice() a card from this list (e.g.
+        # test_attach_tool_to_orchestrator) could pick "Knowledge Base" and
+        # open that panel instead of an agent's config panel, then time out
+        # forever waiting for a Model Provider dropdown that panel doesn't
+        # have. An agent node's display name is the first line of its text
+        # (name, description, model, role stacked underneath).
         nodes = self.wait.until(
             EC.presence_of_all_elements_located(self.graph_node)
         )
@@ -876,7 +893,7 @@ class AgentBuildPage:
         names = []
         for node in nodes:
             data_id = node.get_attribute("data-id") or ""
-            if "mcp" in data_id:
+            if "mcp" in data_id or data_id == "knowledge-base":
                 continue
 
             text = node.text.strip()

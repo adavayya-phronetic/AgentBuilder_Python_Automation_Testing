@@ -1,7 +1,0 @@
-Current URL: https://agent-builder.phronetic.ai/auth
-Created tool 'QA_Automation_Tool_Prompt'.
-Functions found in Test your tool panel: ['analyzeText', 'caseConverter', 'wordReverser', 'todoFormatter']
-Test output for analyzeText(['text']): '[\n  {\n    "type": "text",\n    "text": "Text Analysis Results:\\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\nWord Count:              1\\nCharacter Count:         2 (with spaces)\\nCharacter Count:         2 (without spaces)\\nSentence Count:          1",\n    "annotations": null,\n    "_meta": null\n  }\n]'
-Test output for caseConverter(['text', 'targetCase']): '[\n  {\n    "type": "text",\n    "text": "Error: Unknown case format \'30\'. Use \'uppercase\', \'lowercase\', or \'titlecase\'.",\n    "annotations": null,\n    "_meta": null\n  }\n]'
-Test output for wordReverser(['text']): '[\n  {\n    "type": "text",\n    "text": "20",\n    "annotations": null,\n    "_meta": null\n  }\n]'
-Test output for todoFormatter(['tasks']): '[\n  {\n    "type": "text",\n    "text": "📋 Todo Checklist:\\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\n☐ 20",\n    "annotations": null,\n    "_meta": null\n  }\n]'

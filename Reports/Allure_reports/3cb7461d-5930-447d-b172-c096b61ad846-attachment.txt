@@ -1,2 +1,0 @@
-Deleting tool 'QA_Automation_Tool_Prompt'.
-Confirmed 'QA_Automation_Tool_Prompt' was deleted and no longer appears in the list.
