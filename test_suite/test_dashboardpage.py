@@ -422,3 +422,67 @@ def test_agents_activity_view_all_navigates_to_my_agents(logged_in_driver):
         )
         print("Redirected to My Agents page:", driver.current_url)
         attach_step_screenshot(driver, "My Agents page reached")
+
+
+@allure.feature("Dashboard")
+@allure.story("Agents & Activity")
+@allure.title("Clicking a Top Agents entry navigates to that agent's Build Agent page")
+@allure.severity(allure.severity_level.NORMAL)
+@pytest.mark.dashboard
+def test_top_agents_row_navigates_to_build_agent_page(logged_in_driver):
+    driver = logged_in_driver
+
+    with allure.step("Navigate to Dashboard and click the first Top Agents entry"):
+        dashboard = DashboardPage(driver)
+        dashboard.navigate_to_dashboard()
+
+        names = dashboard.get_top_agent_names()
+        assert names, "No entries found in the Top Agents list"
+        target_name = names[0]
+        allure.attach(target_name, name="Clicked agent", attachment_type=allure.attachment_type.TEXT)
+
+        dashboard.click_top_agent_row(0)
+
+    with allure.step("Verify redirect to that agent's Build Agent page"):
+        WebDriverWait(driver, 20).until(EC.url_contains("/build-agent/configure/"))
+        assert "/build-agent/configure/" in driver.current_url, (
+            f"Expected redirect to the Build Agent page for '{target_name}', "
+            f"current URL: {driver.current_url}"
+        )
+        print(f"Top Agents entry '{target_name}' redirected to its Build Agent page:", driver.current_url)
+        attach_step_screenshot(driver, "Build Agent page reached from Top Agents")
+
+
+@allure.feature("Dashboard")
+@allure.story("Agents & Activity")
+@allure.title("Clicking an Activity entry navigates to that agent's Traces page")
+@allure.severity(allure.severity_level.NORMAL)
+@pytest.mark.dashboard
+def test_activity_row_navigates_to_traces_page(logged_in_driver):
+    """
+    Unlike the visually similar Top Agents list (a usage ranking that opens
+    the Build Agent page), Activity is a live call/session feed — clicking
+    an entry here opens that agent's session Traces page instead, confirmed
+    live (URL contains '/traces/<agent_id>').
+    """
+    driver = logged_in_driver
+
+    with allure.step("Navigate to Dashboard and click the first Activity entry"):
+        dashboard = DashboardPage(driver)
+        dashboard.navigate_to_dashboard()
+
+        names = dashboard.get_activity_agent_names()
+        assert names, "No entries found in the Activity list"
+        target_name = names[0]
+        allure.attach(target_name, name="Clicked agent", attachment_type=allure.attachment_type.TEXT)
+
+        dashboard.click_activity_row(0)
+
+    with allure.step("Verify redirect to that agent's Traces page"):
+        WebDriverWait(driver, 20).until(EC.url_contains("/traces/"))
+        assert "/traces/" in driver.current_url, (
+            f"Expected redirect to the Traces page for '{target_name}', "
+            f"current URL: {driver.current_url}"
+        )
+        print(f"Activity entry '{target_name}' redirected to its Traces page:", driver.current_url)
+        attach_step_screenshot(driver, "Traces page reached from Activity")

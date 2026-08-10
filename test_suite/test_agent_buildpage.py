@@ -82,9 +82,21 @@ def test_create_agent(logged_in_driver):
 
         agents_page = MyAgentsPage(driver)
 
+        # Every other test in this module depends on this creation succeeding
+        # (see _require_created_agent_name()), so a duplicate-name collision
+        # here fails the whole module's worth of tests, not just this one —
+        # confirmed live: re-running this same fixed prompt on a day already
+        # heavily tested reliably lands on the same LLM-picked name and
+        # collides with an earlier run's agent. A timestamp appended to the
+        # requested name guarantees a fresh one every run instead of leaving
+        # it to the LLM's own (collision-prone) judgment — confirmed live
+        # that the Name field accepts alphanumeric characters plus spaces,
+        # hyphens, and underscores, so a space-separated number is safe.
+        unique_agent_name = f"Recipe Assistant {int(time.time())}"
         agents_page.enter_prompt(
-            "Create an assistant that drafts polite business communications."
+            "Create an assistant that helps users organize daily tasks."
             "Do not ask follow-up questions,just do the basic configuration."
+            f" Name this agent '{unique_agent_name}'."
         )
 
         agents_page.click_create_agent()

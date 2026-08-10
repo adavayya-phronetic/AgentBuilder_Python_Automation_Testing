@@ -138,6 +138,21 @@ class ToolPage:
             "//h2"
         )
 
+        # The three Available Tools filter tabs. "All" is the union of
+        # Platform Tools (tools shared on the platform by any user) and
+        # Custom Tools (tools created by the current account) — confirmed
+        # live the three tabs return distinctly different lists, not the
+        # same one regardless of selection.
+        self.all_tools_tab = (
+            By.XPATH,
+            "//button[@role='tab' and normalize-space()='All']"
+        )
+
+        self.platform_tools_tab = (
+            By.XPATH,
+            "//button[@role='tab' and normalize-space()='Platform Tools']"
+        )
+
         self.custom_tools_tab = (
             By.XPATH,
             "//button[normalize-space()='Custom Tools']"
@@ -440,17 +455,46 @@ class ToolPage:
             EC.element_to_be_clickable(self.generate_button)
         )
 
+    @allure.step("Filter to All tools")
+    def click_all_tools_tab(self):
+        self.wait.until(
+            EC.element_to_be_clickable(self.all_tools_tab)
+        ).click()
+
+    @allure.step("Filter to Platform Tools")
+    def click_platform_tools_tab(self):
+        self.wait.until(
+            EC.element_to_be_clickable(self.platform_tools_tab)
+        ).click()
+
     @allure.step("Filter to Custom Tools")
     def click_custom_tools_tab(self):
         self.wait.until(
             EC.element_to_be_clickable(self.custom_tools_tab)
         ).click()
 
-    def get_tool_names(self):
-        cards = self.wait.until(
-            EC.presence_of_all_elements_located(self.tool_card_title)
-        )
-        return [c.text.strip() for c in cards if c.text.strip()]
+    def is_tab_selected(self, tab_locator, timeout=10):
+        return WebDriverWait(self.driver, timeout).until(
+            EC.presence_of_element_located(tab_locator)
+        ).get_attribute("aria-selected") == "true"
+
+    def get_tool_names(self, timeout=10):
+        # A tab switch re-renders the card grid, so elements located here
+        # can go stale between being found and having .text read off them —
+        # same debounce/re-render race handled elsewhere in this suite
+        # (e.g. MyAgentsPage.get_card_names). Retry a couple of times rather
+        # than let that one-off race fail the whole call.
+        for _ in range(3):
+            try:
+                cards = WebDriverWait(self.driver, timeout).until(
+                    EC.presence_of_all_elements_located(self.tool_card_title)
+                )
+                return [c.text.strip() for c in cards if c.text.strip()]
+            except TimeoutException:
+                return []
+            except StaleElementReferenceException:
+                continue
+        return []
 
     @allure.step("Open tool '{tool_name}'")
     def open_tool_card(self, tool_name):

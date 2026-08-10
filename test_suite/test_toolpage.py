@@ -1,5 +1,6 @@
 import os
 import random
+import time
 
 import allure
 import pytest
@@ -38,11 +39,26 @@ Notes:
 
 def _sample_value_for_param(param_name, index):
     # Prompt-generated code decides its own parameter names, so this can't
-    # assume 'a'/'b' like the fixed calculator.py file does. An "operator"-
-    # style param gets a real operator name; anything else is treated as
-    # one of the two numbers and gets a plain numeric sample.
-    if "op" in param_name.lower():
+    # assume fixed ones like the calculator.py file does. Matched against
+    # TEXT_UTILITY_TOOL_DESCRIPTION's actual functions (analyzeText,
+    # caseConverter, wordReverser, todoFormatter) — confirmed live: every one
+    # of their inputs is a string, so a numeric sample (the old blanket
+    # default, left over from an earlier arithmetic-tool version of this
+    # test) is the wrong type for all of them, e.g. typing '20' into
+    # analyzeText's 'text' field.
+    name = param_name.lower()
+    if "op" in name:
         return "add"
+    if "case" in name:
+        return "uppercase"
+    if "task" in name:
+        return "Buy groceries, Clean the house, Finish the report"
+    if "text" in name:
+        return "The quick brown fox jumps over the lazy dog."
+    # Fallback for any other prompt-generated param this description's
+    # functions don't have (e.g. a differently-worded regeneration) — the
+    # previous numeric-only default, kept as a last resort rather than the
+    # assumed norm.
     numeric_samples = ["20", "30", "5", "2"]
     return numeric_samples[index % len(numeric_samples)]
 
@@ -99,7 +115,11 @@ def test_create_and_test_tool_via_prompt(logged_in_driver, request):
     occasional null result doesn't fail the whole run.
     """
     driver = logged_in_driver
-    tool_name = "QA_Automation_Tool_Prompt"
+    # A fixed name collides with earlier runs' still-existing tools
+    # (confirmed live, same issue as agent names — see test_create_agent's
+    # own timestamp fix) — a timestamp suffix guarantees a fresh one every
+    # run instead.
+    tool_name = f"QA_Automation_Tool_Prompt_{int(time.time())}"
 
     with allure.step(f"Create a new tool '{tool_name}' via prompt"):
         tool_page = ToolPage(driver)
@@ -174,7 +194,7 @@ def test_create_tool_and_upload_code_file(logged_in_driver, request):
     """
     driver = logged_in_driver
 
-    tool_name = "QA_Automation_Tool_Upload"
+    tool_name = f"QA_Automation_Tool_Upload_{int(time.time())}"
     invalid_file_path = os.path.abspath(os.path.join("Files", "Python_Math_Operations.pdf"))
     valid_code_path = os.path.abspath(os.path.join("Files", "calculator.py"))
 
@@ -274,7 +294,7 @@ def test_create_tool_via_mcp_url(logged_in_driver, request):
        (read-only) sample values.
     """
     driver = logged_in_driver
-    tool_name = "QA_Automation_Tool_MCP_FindEmail"
+    tool_name = f"QA_Automation_Tool_MCP_FindEmail_{int(time.time())}"
     mcp_url = f"{secrets.zapier_mcp_base_url}={secrets.zapier_mcp_token}"
 
     # Real, tool-specific sample values for this known Gmail integration —
@@ -395,3 +415,154 @@ def test_delete_tool(logged_in_driver, request):
             f"Tool '{target_tool}' still appears in the Available Tools list after deletion"
         )
         print(f"Confirmed '{target_tool}' was deleted and no longer appears in the list.")
+
+
+@allure.feature("Tool Management")
+@allure.story("Available Tools Filters")
+@allure.title("'All' tab displays every available tool")
+@allure.severity(allure.severity_level.NORMAL)
+@pytest.mark.tool_creation
+def test_all_tools_tab_displays_all_tools(logged_in_driver):
+    driver = logged_in_driver
+
+    with allure.step("Open Tools and select the 'All' tab"):
+        tool_page = ToolPage(driver)
+        tool_page.click_tools_nav()
+        tool_page.click_all_tools_tab()
+
+    with allure.step("Verify the 'All' tab is selected and shows a non-empty combined list"):
+        assert tool_page.is_tab_selected(tool_page.all_tools_tab), (
+            "'All' tab did not become the selected tab after clicking it"
+        )
+        names = tool_page.get_tool_names()
+        assert names, "'All' tab displayed no tools"
+        print(f"'All' tab displayed {len(names)} tools.")
+        attach_step_screenshot(driver, "'All' tab tool list")
+
+
+@allure.feature("Tool Management")
+@allure.story("Available Tools Filters")
+@allure.title("'Platform Tools' tab displays only platform-shared tools")
+@allure.severity(allure.severity_level.NORMAL)
+@pytest.mark.tool_creation
+def test_platform_tools_tab_displays_platform_tools(logged_in_driver):
+    driver = logged_in_driver
+
+    with allure.step("Open Tools and note the 'Custom Tools' list for comparison"):
+        tool_page = ToolPage(driver)
+        tool_page.click_tools_nav()
+        tool_page.click_custom_tools_tab()
+        custom_names = set(tool_page.get_tool_names())
+
+    with allure.step("Select the 'Platform Tools' tab"):
+        tool_page.click_platform_tools_tab()
+
+    with allure.step("Verify the 'Platform Tools' tab is selected and its list differs from Custom Tools"):
+        assert tool_page.is_tab_selected(tool_page.platform_tools_tab), (
+            "'Platform Tools' tab did not become the selected tab after clicking it"
+        )
+        platform_names = tool_page.get_tool_names()
+        assert platform_names, "'Platform Tools' tab displayed no tools"
+        # Confirmed live: Platform Tools (shared on the platform by any
+        # user) and Custom Tools (created by this account) are genuinely
+        # different filtered lists, not the same list regardless of tab —
+        # this is what actually distinguishes the tab working from a no-op.
+        assert set(platform_names) != custom_names, (
+            "'Platform Tools' tab showed the exact same list as 'Custom Tools' — "
+            "filter does not appear to be applied"
+        )
+        print(f"'Platform Tools' tab displayed {len(platform_names)} tools, distinct from Custom Tools.")
+        attach_step_screenshot(driver, "'Platform Tools' tab tool list")
+
+
+@allure.feature("Tool Management")
+@allure.story("Available Tools Filters")
+@allure.title("'Custom Tools' tab displays only this account's own tools")
+@allure.severity(allure.severity_level.NORMAL)
+@pytest.mark.tool_creation
+def test_custom_tools_tab_displays_custom_tools(logged_in_driver):
+    driver = logged_in_driver
+
+    with allure.step("Open Tools and note the 'Platform Tools' list for comparison"):
+        # Compared against Platform Tools rather than All: confirmed live
+        # the 'All' tab is capped/paginated (scrolling and no pagination
+        # controls found still leave items missing from it that genuinely
+        # exist in Custom Tools), so a subset-of-All check is unreliable.
+        # Platform Tools has no such gap and is already confirmed (previous
+        # test) to be a genuinely distinct list from Custom Tools.
+        tool_page = ToolPage(driver)
+        tool_page.click_tools_nav()
+        tool_page.click_platform_tools_tab()
+        platform_names = set(tool_page.get_tool_names())
+
+    with allure.step("Select the 'Custom Tools' tab"):
+        tool_page.click_custom_tools_tab()
+
+    with allure.step("Verify the 'Custom Tools' tab is selected and its list differs from Platform Tools"):
+        assert tool_page.is_tab_selected(tool_page.custom_tools_tab), (
+            "'Custom Tools' tab did not become the selected tab after clicking it"
+        )
+        custom_names = tool_page.get_tool_names()
+        assert custom_names, "'Custom Tools' tab displayed no tools"
+        assert set(custom_names) != platform_names, (
+            "'Custom Tools' tab showed the exact same list as 'Platform Tools' — "
+            "filter does not appear to be applied"
+        )
+        print(f"'Custom Tools' tab displayed {len(custom_names)} tools, distinct from Platform Tools.")
+        attach_step_screenshot(driver, "'Custom Tools' tab tool list")
+
+
+@allure.feature("Tool Management")
+@allure.story("Search")
+@allure.title("Search Tool filters correctly by leading, middle, and trailing characters of a tool's name")
+@allure.severity(allure.severity_level.NORMAL)
+@pytest.mark.tool_creation
+def test_search_tool_by_first_middle_last_letters(logged_in_driver):
+    """
+    Character-based substring search — mirrors the same first/middle/last
+    text concept the sheet's My Agents search cases (TC_SearchAgent) already
+    cover for agent names, applied to tools. Confirmed live against 'GmailMCP':
+    'Gmai' (first 4), 'ailM' (middle 4), 'lMCP' (last 4) all still match it.
+    """
+    driver = logged_in_driver
+    tool_page = ToolPage(driver)
+
+    with allure.step("Open Tools and pick a tool name to search for"):
+        tool_page.click_tools_nav()
+        tool_page.click_all_tools_tab()
+        all_names = tool_page.get_tool_names()
+        assert all_names, "Need at least one existing tool to search for"
+
+        target = next((n for n in all_names if len(n) >= 6), all_names[0])
+        allure.attach(target, name="Target tool", attachment_type=allure.attachment_type.TEXT)
+        print(f"Target tool: '{target}' (length {len(target)})")
+
+        chunk = min(4, len(target))
+        first_text = target[:chunk]
+        mid = len(target) // 2
+        middle_text = target[max(mid - chunk // 2, 0):max(mid - chunk // 2, 0) + chunk]
+        last_text = target[-chunk:]
+
+    with allure.step(f"Search by first letters '{first_text}'"):
+        tool_page.search_tool(first_text)
+        results = tool_page.get_tool_names()
+        assert target in results, (
+            f"First letters {first_text!r} should still match {target!r}, got {results}"
+        )
+
+    with allure.step(f"Search by middle letters '{middle_text}'"):
+        tool_page.search_tool(middle_text)
+        results = tool_page.get_tool_names()
+        assert target in results, (
+            f"Middle letters {middle_text!r} should still match {target!r}, got {results}"
+        )
+
+    with allure.step(f"Search by last letters '{last_text}'"):
+        tool_page.search_tool(last_text)
+        results = tool_page.get_tool_names()
+        assert target in results, (
+            f"Last letters {last_text!r} should still match {target!r}, got {results}"
+        )
+        attach_step_screenshot(driver, "Search by first/middle/last letters")
+
+    tool_page.search_tool("")

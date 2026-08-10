@@ -192,6 +192,34 @@ class DashboardPage:
             "//span[normalize-space()='View All']/ancestor::*[self::a or self::button][1]"
         )
 
+        # --- Agents & Activity: "Top Agents" ranked list ---
+        # Confirmed live: clicking a row navigates to that agent's Build
+        # Agent page (/build-agent/configure/<agent_id>). Scoped from the
+        # "Top Agents" column-header <p> up to its row container, then into
+        # the sibling scrollable list — matches the "Sessions" column header
+        # right next to it in the DOM, so anchoring on the row container
+        # (not just any element under it) avoids ambiguity.
+        self.top_agents_rows = (
+            By.XPATH,
+            "//p[normalize-space()='Top Agents']/ancestor::div[contains(@class,'flex-none')][1]"
+            "/following-sibling::div[contains(@class,'overflow-y-auto')][1]"
+            "/div[contains(@class,'cursor-pointer')]"
+        )
+
+        # --- Agents & Activity: "Activity" live call/session feed ---
+        # Confirmed live: clicking a row navigates to that agent's Traces
+        # page (/traces/<agent_id>?tab=traces...) — a DIFFERENT destination
+        # than Top Agents above, even though both lists look similar and
+        # sit in the same card layout (Activity is a session/call feed, not
+        # a ranking, so it makes sense it opens session traces rather than
+        # the Build page).
+        self.activity_rows = (
+            By.XPATH,
+            "//p[normalize-space()='Activity']/ancestor::div[contains(@class,'flex-none')][1]"
+            "/following-sibling::div[contains(@class,'overflow-y-auto')][1]"
+            "/div[contains(@class,'cursor-pointer')]"
+        )
+
     @allure.step("Click 'Create Agent'")
     def click_create_agent(self):
         self.wait.until(
@@ -387,3 +415,34 @@ class DashboardPage:
         self.wait.until(
             EC.element_to_be_clickable(self.agents_activity_view_all_link)
         ).click()
+
+    def get_top_agent_names(self, timeout=10):
+        # Each row's raw text is "<rank>\n<agent name>\n<session count>" —
+        # the name is always the middle line regardless of how many digits
+        # the rank/count are.
+        rows = WebDriverWait(self.driver, timeout).until(
+            EC.presence_of_all_elements_located(self.top_agents_rows)
+        )
+        return [r.text.strip().splitlines()[1] for r in rows if r.text.strip()]
+
+    @allure.step("Click Top Agents row {index}")
+    def click_top_agent_row(self, index=0, timeout=10):
+        rows = WebDriverWait(self.driver, timeout).until(
+            EC.presence_of_all_elements_located(self.top_agents_rows)
+        )
+        rows[index].click()
+
+    def get_activity_agent_names(self, timeout=10):
+        # Each row's raw text is "<agent name>\n<calls/status/last seen>" —
+        # the name is always the first line.
+        rows = WebDriverWait(self.driver, timeout).until(
+            EC.presence_of_all_elements_located(self.activity_rows)
+        )
+        return [r.text.strip().splitlines()[0] for r in rows if r.text.strip()]
+
+    @allure.step("Click Activity row {index}")
+    def click_activity_row(self, index=0, timeout=10):
+        rows = WebDriverWait(self.driver, timeout).until(
+            EC.presence_of_all_elements_located(self.activity_rows)
+        )
+        rows[index].click()
