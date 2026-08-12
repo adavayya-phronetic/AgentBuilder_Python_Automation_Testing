@@ -1,3 +1,4 @@
+import datetime
 import os
 import random
 import time
@@ -303,10 +304,21 @@ def test_create_tool_via_mcp_url(logged_in_driver, request):
     # _sample_value_for_param for prompt-generated arithmetic tools) don't
     # apply here since these parameter names and their meaning are fixed
     # and known ahead of time.
+    #
+    # query is scoped to today's inbox mail rather than a fixed keyword like
+    # "newsletter" — after:/before: bound a half-open window a day wide on
+    # each side (rather than after:today alone) so "today" stays correct
+    # regardless of how Gmail's date boundary lines up with the timezone of
+    # the machine running this suite, and in:inbox keeps it to the inbox
+    # only, not all mail.
+    today = datetime.date.today()
     sample_values = {
-        "query": "newsletter",
+        "query": (
+            f"in:inbox after:{today - datetime.timedelta(days=1)} "
+            f"before:{today + datetime.timedelta(days=1)}"
+        ),
         "instructions": "Find the most recent email matching the query.",
-        "output_hint": "Return the sender and subject line.",
+        "output_hint": "Return the sender, cc, and subject line for each matching email.",
     }
 
     with allure.step(f"Create a new tool '{tool_name}' from an external MCP URL"):
