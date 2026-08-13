@@ -1,0 +1,4 @@
+Confirmed empty-name validation error for agent 'Recipe Assistant 1786613385'.
+Confirmed whitespace-only agent name is rejected for 'Recipe Assistant 1786613385'.
+Confirmed non-alphanumeric name triggers inline error for agent 'Recipe Assistant 1786613385'.
+Confirmed agent 'Recipe Assistant 1786613385' name restored cleanly with no validation errors.

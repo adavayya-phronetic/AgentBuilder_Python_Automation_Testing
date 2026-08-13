@@ -1,0 +1,1 @@
+Refresh reset the dropdown to 'Today' and reloaded data.

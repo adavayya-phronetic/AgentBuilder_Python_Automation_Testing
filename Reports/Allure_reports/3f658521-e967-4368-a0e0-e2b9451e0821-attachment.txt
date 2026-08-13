@@ -1,0 +1,2 @@
+Task Completion before filter change: 0%
+Task Completion refreshed to '100%' for the selected period.

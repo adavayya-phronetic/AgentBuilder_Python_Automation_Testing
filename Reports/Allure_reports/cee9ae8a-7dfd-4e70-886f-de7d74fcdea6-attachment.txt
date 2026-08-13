@@ -1,0 +1,1 @@
+Textarea value after Shift+Enter: 'Line1\nLine2'

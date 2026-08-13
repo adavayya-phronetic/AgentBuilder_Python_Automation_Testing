@@ -15,9 +15,13 @@ from Utility.allure_helpers import attach_step_screenshot, attach_scrolled_scree
 # ----------------------------------------------------------------------
 # One agent, created once, shared by every test below it in this module.
 # Login also happens exactly once: every test here uses the session-scoped
-# `logged_in_driver` fixture (login happens the first time it's requested,
-# by test_create_agent since it runs first) rather than each test logging
-# in independently.
+# `logged_in_driver` fixture, shared with every other module in the suite
+# that also requests it — login only happens the very first time *any* of
+# them asks for it. Whichever module runs first ends up owning that login,
+# not necessarily this one, so test_create_agent below can't assume it's
+# the first test to ever touch the fixture, nor that the browser is still
+# sitting on the fresh post-login /dashboard state — see the explicit
+# navigate_to_dashboard() call there.
 #
 # All automation after creation runs directly on that one agent's Build
 # Agent page (EDITOR / GRAPH / CODE tabs) — tests switch tabs on the page
@@ -78,6 +82,16 @@ def test_create_agent(logged_in_driver):
 
     with allure.step("Click 'Create Agent' on the dashboard and submit a creation prompt"):
         dashboard_page = DashboardPage(driver)
+        # Hard-navigate here rather than assuming the shared session is
+        # already sitting on /dashboard: whichever test module happens to
+        # run right before this one in the full suite has already reset it
+        # to /agents (conftest's autouse per-test reset). Confirmed live —
+        # without this, click_create_agent() below waits on the *wrong*
+        # "Create Agent" button (the disabled prompt-box submit on /agents
+        # itself, still empty at this point) and times out, taking every
+        # other test in this module down with it since they all depend on
+        # this one actually creating an agent.
+        dashboard_page.navigate_to_dashboard()
         dashboard_page.click_create_agent()
 
         agents_page = MyAgentsPage(driver)

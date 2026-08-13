@@ -1,0 +1,1 @@
+Confirmed Send is disabled for a whitespace-only message ('Recipe Assistant 1786613385').

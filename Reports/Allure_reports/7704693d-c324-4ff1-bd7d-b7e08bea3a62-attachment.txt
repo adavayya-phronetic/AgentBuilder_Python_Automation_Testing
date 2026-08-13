@@ -1,0 +1,2 @@
+Opened Analytics for agent 'Resume Data Extractor & Organizer'.
+Analytics page loaded with all widgets: ['Latency', 'Task Completion', 'Engagement Time', 'Security Risks', 'CSAT Score', 'Cost']

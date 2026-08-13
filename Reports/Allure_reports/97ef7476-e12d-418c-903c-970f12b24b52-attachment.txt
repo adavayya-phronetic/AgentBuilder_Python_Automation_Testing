@@ -1,0 +1,2 @@
+Latency before interaction for 'Gmail Assistant': 0.00 ms
+Latency updated from '0.00 ms' to '13138.00 ms' after the interaction.

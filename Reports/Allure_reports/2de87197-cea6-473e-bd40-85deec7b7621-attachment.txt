@@ -1,0 +1,1 @@
+Yesterday option selected successfully; Latency: 5618.00 ms

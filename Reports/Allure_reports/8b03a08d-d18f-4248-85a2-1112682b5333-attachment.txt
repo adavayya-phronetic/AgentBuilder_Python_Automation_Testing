@@ -1,0 +1,1 @@
+Calendar popup opened via the calendar icon, showing: August 2026

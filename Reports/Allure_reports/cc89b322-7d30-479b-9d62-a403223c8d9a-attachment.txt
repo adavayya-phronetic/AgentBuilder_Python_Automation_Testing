@@ -1,0 +1,1 @@
+Session Performance graph correctly shows 0 sessions for the empty date range.

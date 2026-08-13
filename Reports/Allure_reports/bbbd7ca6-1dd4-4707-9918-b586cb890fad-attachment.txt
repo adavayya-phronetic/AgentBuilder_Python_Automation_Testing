@@ -1,0 +1,2 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Dashboard loaded with all widgets and summary cards.

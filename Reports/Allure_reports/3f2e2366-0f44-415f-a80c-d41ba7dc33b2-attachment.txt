@@ -1,0 +1,2 @@
+Character count (empty): 0
+Character count after typing: 11

@@ -1,0 +1,1 @@
+Sign up URL: https://auth.phronetic.ai/signup?redirect_uri=https%3A%2F%2Fagent-builder.phronetic.ai%2Fauth%2Fcallback&client_id=agent-builder&code_challenge=hnEgVP2wL3Ak0oaBY-Ro6IPNESNqi1kB39tZHGA_9mc

@@ -1,0 +1,37 @@
+Current URL: https://agent-builder.phronetic.ai/auth
+Step 1 OK: opened Chat for agent 'Gmail Assistant'.
+Step 2 OK: message sent and agent responded at https://chat.phronetic.ai/_r1Cm9gIp6LFaiSi/chat/0d7a65804da54516a604e4b51d64bfc9
+Step 3 OK: new chat opened at https://chat.phronetic.ai/_r1Cm9gIp6LFaiSi/chat?newchat=true
+Step 4 OK: 'sample_test.pdf' uploaded and agent responded with a summary.
+Step 5a OK: navigated to agent details page at https://chat.phronetic.ai/_r1Cm9gIp6LFaiSi/agent
+Step 5b OK: Usage History displayed.
+Step 5c OK: returned to Chat at https://chat.phronetic.ai/_r1Cm9gIp6LFaiSi/chat
+Step 6 OK: bug report submitted and confirmed.
+Step 7a OK: navigated to agent details page for recharge at https://chat.phronetic.ai/_r1Cm9gIp6LFaiSi/agent
+Step 7b OK: 'Add Funds to Wallet' modal opened.
+Step 7c OK: selected amount '+100'.
+Step 7d OK: redirected to billing page at https://secure.ccavenue.com/transaction/transaction.do?command=initiateTransaction
+Step 7e OK: returned to Chat at https://chat.phronetic.ai/_r1Cm9gIp6LFaiSi/chat
+Step 8 OK: logged out and redirected to the login page: https://auth.phronetic.ai/login?client_id=chat-app&redirect_uri=https%3A%2F%2Fchat.phronetic.ai%2Fauth%2Fcallback&code_challenge=APJbi6AeBtn3VzQfKN3SV1FvUtazUGJTBWOEV8Eb1uo
+Failed to settle main window back onto /agents: Message: 
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7ff76247abb5+151b5]
+	chromedriver!GetHandleVerifier [0x7ff76247ac10+15210]
+	chromedriver!(No symbol) [0x7ff761fa5d6d]
+	chromedriver!(No symbol) [0x7ff762001289]
+	chromedriver!(No symbol) [0x7ff76200158c]
+	chromedriver!(No symbol) [0x7ff762052027]
+	chromedriver!(No symbol) [0x7ff76204ec0b]
+	chromedriver!(No symbol) [0x7ff761ff37cc]
+	chromedriver!(No symbol) [0x7ff761ff46f3]
+	chromedriver!GetHandleVerifier [0x7ff762a9b79b+635d9b]
+	chromedriver!GetHandleVerifier [0x7ff762a95ac6+6300c6]
+	chromedriver!GetHandleVerifier [0x7ff762abbcee+6562ee]
+	chromedriver!GetHandleVerifier [0x7ff762498ffe+335fe]
+	chromedriver!GetHandleVerifier [0x7ff7624a147c+3ba7c]
+	chromedriver!GetHandleVerifier [0x7ff762484d64+1f364]
+	chromedriver!GetHandleVerifier [0x7ff762484ef4+1f4f4]
+	chromedriver!GetHandleVerifier [0x7ff762467d97+2397]
+	KERNEL32!BaseThreadInitThunk [0x7ffc5e5dccb7+17]
+	ntdll!RtlUserThreadStart [0x7ffc5fbead6c+2c]
+
