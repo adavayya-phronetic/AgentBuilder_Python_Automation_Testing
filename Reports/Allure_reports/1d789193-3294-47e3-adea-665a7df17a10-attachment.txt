@@ -1,0 +1,4 @@
+Agent: Recipe Assistant 1786950047
+Card: Daily Task Management Assistant
+Provider: Bedrock
+Model: Claude Opus 4.5

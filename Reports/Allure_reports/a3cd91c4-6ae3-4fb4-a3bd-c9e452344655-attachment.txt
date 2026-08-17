@@ -1,0 +1,1 @@
+Last 7 Days option selected successfully; Latency: 5473.62 ms

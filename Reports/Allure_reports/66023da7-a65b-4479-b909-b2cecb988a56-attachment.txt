@@ -1,1 +1,0 @@
-Last 7 Days option selected successfully; Latency: 0.00 ms

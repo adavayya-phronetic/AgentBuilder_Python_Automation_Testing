@@ -294,10 +294,18 @@ class MeetPage:
         # can still be mid-render at that exact moment and don't show up
         # within get_more_options_menu_items()'s per-item wait, even though
         # the same locators find them instantly on a fresh, non-rushed
-        # open. A short settle pause here — same pragmatic pattern already
-        # used elsewhere in this file after heavy transitions — lets the
-        # full menu finish rendering before anything reads its contents.
-        time.sleep(2)
+        # open. A fixed sleep here previously guessed at how long that
+        # takes and wasn't reliably long enough (confirmed live: still
+        # missing after a 2s sleep on a slower render) — waiting for their
+        # actual presence instead adapts to how long rendering genuinely
+        # takes on a given run rather than gambling on one fixed number.
+        for locator in (self.chat_history_menu_item, self.share_screen_menu_item):
+            try:
+                WebDriverWait(self.driver, 15).until(
+                    EC.presence_of_element_located(locator)
+                )
+            except TimeoutException:
+                pass
 
     def get_more_options_menu_items(self, timeout=10):
         """Returns the visible text of every item currently shown in the More options menu.

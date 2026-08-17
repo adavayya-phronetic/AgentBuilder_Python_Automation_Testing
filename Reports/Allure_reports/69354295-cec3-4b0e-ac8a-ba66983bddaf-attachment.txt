@@ -1,0 +1,2 @@
+Current URL: https://auth.phronetic.ai/login?client_id=agent-builder&redirect_uri=https%3A%2F%2Fagent-builder.phronetic.ai%2Fauth%2Fcallback&code_challenge=dnlOARRqY6tAKcJaJ4WAhbS2nikihdAs_tFRYcyZKQI
+SQL injection payload validation message: Please include an '@' in the email address. '' OR '1'='1' is missing an '@'.

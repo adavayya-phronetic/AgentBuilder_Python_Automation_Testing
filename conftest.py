@@ -1,3 +1,4 @@
+import json
 import os
 import subprocess
 import threading
@@ -9,6 +10,7 @@ from Webpages.landing_page import LandingPage
 from Webpages.login_page import LoginPage
 from Utility.drivers import get_driver
 from Utility import config
+from Utility.allure_helpers import get_page_folder, get_page_label, next_screenshot_seq
 
 
 @pytest.fixture(params=["chrome", "edge"])
@@ -119,6 +121,50 @@ def _recover_shared_session_if_dead(request):
         _recover_dead_driver(driver_instance)
 
 
+def _write_failure_log(request, rep_call, current_url, page_folder, test_name):
+    """Writes a structured JSON log for a failed test into Logs/Failed/<page>/,
+    parallel to (and sharing the exact same base filename as) the .png/.html
+    written alongside it in Screenshot/Failed/<page>/ — so a failure's
+    screenshot, page source, and log all sit at matching positions across
+    the two trees.
+
+    Pulled from the pytest TestReport rather than needing the test to opt
+    in: `rep_call.longrepr`/`.longreprtext` and `.capstdout` are populated
+    by pytest itself for any failing test, regardless of whether it uses
+    a plain assert or raises.
+    """
+    exception_info = {"type": None, "message": None, "location": None}
+    try:
+        reprcrash = getattr(rep_call.longrepr, "reprcrash", None)
+        if reprcrash is not None:
+            exc_type, _, exc_message = (reprcrash.message or "").partition(": ")
+            exception_info["type"] = exc_type or None
+            exception_info["message"] = exc_message or reprcrash.message
+            exception_info["location"] = f"{reprcrash.path}:{reprcrash.lineno}"
+    except Exception:
+        pass
+
+    log_data = {
+        "test": request.node.name,
+        "page": get_page_label(request),
+        "file": os.path.basename(str(request.node.fspath)),
+        "timestamp": datetime.now().isoformat(timespec="seconds"),
+        "url": current_url,
+        "outcome": "FAILED",
+        "stdout": getattr(rep_call, "capstdout", "") or "",
+        "exception": exception_info,
+        "traceback": getattr(rep_call, "longreprtext", "") or str(rep_call.longrepr),
+    }
+
+    try:
+        log_dir = os.path.join("Logs", "Failed", page_folder)
+        os.makedirs(log_dir, exist_ok=True)
+        with open(os.path.join(log_dir, f"{test_name}.json"), "w", encoding="utf-8") as f:
+            json.dump(log_data, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        print(f"Failed to write failure log: {e}")
+
+
 def _capture_test_artifacts(driver_instance, request):
     """Takes a pass/fail screenshot (+ page source/URL on failure) for the given driver."""
     rep_call = getattr(request.node, "rep_call", None)
@@ -127,28 +173,39 @@ def _capture_test_artifacts(driver_instance, request):
 
     # Stamped onto every filename so repeated runs of the same test
     # accumulate a new screenshot each time instead of overwriting the
-    # previous one.
+    # previous one. The leading sequence number reflects real execution
+    # order (shared across every screenshot writer in the run — see
+    # Utility.allure_helpers.next_screenshot_seq), and the folder groups
+    # shots by page (see get_page_folder) — together these replace one
+    # flat, alphabetical-by-test-name pile that made it impossible to tell
+    # which screenshot belonged to which page or when it ran.
     timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
-    test_name = f"{request.node.name}_{timestamp}"
+    seq = next_screenshot_seq()
+    test_name = f"{seq:04d}_{request.node.name}_{timestamp}"
+    page_folder = get_page_folder(request)
     try:
         screenshot = driver_instance.get_screenshot_as_png()
         page_source = driver_instance.page_source
         current_url = driver_instance.current_url
 
         if rep_call.failed:
-            os.makedirs("Screenshot/Failed", exist_ok=True)
-            with open(f"Screenshot/Failed/{test_name}.png", "wb") as f:
+            out_dir = os.path.join("Screenshot", "Failed", page_folder)
+            os.makedirs(out_dir, exist_ok=True)
+            with open(os.path.join(out_dir, f"{test_name}.png"), "wb") as f:
                 f.write(screenshot)
-            with open(f"Screenshot/Failed/{test_name}.html", "w", encoding="utf-8") as f:
+            with open(os.path.join(out_dir, f"{test_name}.html"), "w", encoding="utf-8") as f:
                 f.write(page_source)
 
             allure.attach(screenshot, name="Screenshot on failure", attachment_type=allure.attachment_type.PNG)
             allure.attach(page_source, name="Page source on failure", attachment_type=allure.attachment_type.HTML)
             allure.attach(current_url, name="URL on failure", attachment_type=allure.attachment_type.TEXT)
 
+            _write_failure_log(request, rep_call, current_url, page_folder, test_name)
+
         elif rep_call.passed:
-            os.makedirs("Screenshot/Passed", exist_ok=True)
-            with open(f"Screenshot/Passed/{test_name}.png", "wb") as f:
+            out_dir = os.path.join("Screenshot", "Passed", page_folder)
+            os.makedirs(out_dir, exist_ok=True)
+            with open(os.path.join(out_dir, f"{test_name}.png"), "wb") as f:
                 f.write(screenshot)
 
             allure.attach(screenshot, name="Screenshot on pass", attachment_type=allure.attachment_type.PNG)

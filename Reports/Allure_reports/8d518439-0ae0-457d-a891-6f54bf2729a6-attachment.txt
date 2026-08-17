@@ -1,0 +1,2 @@
+Agent URL: https://agent-builder.phronetic.ai/build-agent/configure
+Generated agent name: Recipe Assistant 1786950047

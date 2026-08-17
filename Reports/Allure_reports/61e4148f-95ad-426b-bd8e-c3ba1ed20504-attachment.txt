@@ -1,0 +1,6 @@
+Created tool 'QA_Automation_Tool_Prompt_1786950373'.
+Functions found in Test your tool panel: ['analyzeText', 'caseConverter', 'wordReverser', 'todoFormatter']
+Test output for analyzeText(['text']): '[\n  {\n    "type": "text",\n    "text": "Text Analysis Results:\\n─────────────────────\\nWord Count: 9\\nCharacter Count (with spaces): 44\\nCharacter Count (without spaces): 36\\nSentence Count: 1",\n    "annotations": null,\n    "_meta": null\n  }\n]'
+Test output for caseConverter(['text', 'targetCase']): '[\n  {\n    "type": "text",\n    "text": "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG.",\n    "annotations": null,\n    "_meta": null\n  }\n]'
+Test output for wordReverser(['text']): '[\n  {\n    "type": "text",\n    "text": "dog. lazy the over jumps fox brown quick The",\n    "annotations": null,\n    "_meta": null\n  }\n]'
+Test output for todoFormatter(['tasks']): '[\n  {\n    "type": "text",\n    "text": "Todo Checklist:\\n────────────────────\\n☐ Buy groceries\\n☐ Clean the house\\n☐ Finish the report\\n",\n    "annotations": null,\n    "_meta": null\n  }\n]'

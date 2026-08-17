@@ -191,8 +191,28 @@ def test_configure_agent_io_types(logged_in_driver):
         config_page.select_input_type_audio()
         config_page.select_output_type_audio()
         config_page.select_output_type_video()
+        assert config_page.is_output_type_video_selected(), (
+            "Video output type did not toggle on"
+        )
         print(f"Configured I/O types for '{target_agent_name}'.")
         attach_step_screenshot(driver, "Audio/video I/O configured")
+
+    with allure.step("Turn video output back off before saving"):
+        # This agent is shared by every test in this module, and — unlike
+        # a per-test agent — can also end up being whichever agent
+        # test_meetpage.py's _open_random_active_agent_meet() happens to
+        # pick at random for a completely unrelated test, since it selects
+        # from every active agent on the account, not just this run's own.
+        # Leaving Video output saved here previously meant that pick could
+        # land on a real live camera feed in the Meet call (confirmed
+        # live) instead of the plain audio/avatar UI the Meet suite is
+        # actually built to validate against — this only needs to prove
+        # the toggle itself works, not leave it on afterwards.
+        config_page.deselect_output_type_video()
+        assert not config_page.is_output_type_video_selected(), (
+            "Video output type did not toggle back off"
+        )
+        attach_step_screenshot(driver, "Video output toggled back off")
 
     with allure.step("Save so the next test doesn't inherit unsaved changes"):
         # Tests in this module no longer get a fresh page reload between

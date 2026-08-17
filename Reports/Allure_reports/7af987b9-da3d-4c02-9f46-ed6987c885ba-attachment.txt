@@ -1,4 +1,0 @@
-Agent: Recipe Assistant 1786613385
-Card: Daily Task Organization Assistant
-Provider: Bedrock
-Model: GLM 5

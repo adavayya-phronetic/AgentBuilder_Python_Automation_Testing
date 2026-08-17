@@ -1,1 +1,0 @@
-Today option selected successfully; Latency: 0.00 ms

@@ -1,1 +1,0 @@
-Activity entry 'Business Proposal Assistant' redirected to its Traces page: https://agent-builder.phronetic.ai/traces/agnt_049044cd-b08c-4fbe-9aef-5687dc927137?tab=traces&session_page=1&trace_page=1

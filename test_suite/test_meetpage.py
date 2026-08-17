@@ -7,7 +7,11 @@ import pytest
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoAlertPresentException, UnexpectedAlertPresentException
+from selenium.common.exceptions import (
+    NoAlertPresentException,
+    NoSuchWindowException,
+    UnexpectedAlertPresentException,
+)
 
 from Webpages.my_agents_page import MyAgentsPage
 from Webpages.meet_page import MeetPage
@@ -70,6 +74,13 @@ def _dismiss_stray_alert(driver):
         alert.accept()
     except NoAlertPresentException:
         pass
+    except NoSuchWindowException:
+        # The meet tab itself is already gone (e.g. a real Chrome/WebRTC
+        # crash mid-call — confirmed live: "no such window: target window
+        # already closed") rather than just lacking an alert. Nothing to
+        # dismiss and nothing else this function can do about it; let the
+        # caller's own cleanup continue instead of blowing up here.
+        pass
 
 
 def _close_meet_tab(driver, main_window):
@@ -91,7 +102,19 @@ def _close_meet_tab(driver, main_window):
     except Exception as e:
         print(f"Failed to capture meet tab screenshot: {e}")
 
-    driver.close()
+    # The meet tab can already be closed by the time this runs (same crash
+    # as above) — closing an already-closed window raises the identical
+    # NoSuchWindowException. That must not be allowed to skip the
+    # switch_to.window(main_window) recovery below: confirmed live, without
+    # this guard the exception propagated straight out of this whole
+    # function, main_window was never re-selected, and the shared session
+    # was left stranded on a dead window handle for every test that runs
+    # after this one.
+    try:
+        driver.close()
+    except NoSuchWindowException:
+        pass
+
     driver.switch_to.window(main_window)
 
 
@@ -100,6 +123,16 @@ def _close_meet_tab(driver, main_window):
 @allure.title("Full meet flow: open agent, join meeting, upload a file and ask for a summary, validate in-call features")
 @allure.severity(allure.severity_level.CRITICAL)
 @pytest.mark.meet
+# The Meet tab is a real WebRTC video call (fake media stream, but a real
+# Chrome tab/renderer running it) — confirmed live, that tab can crash
+# mid-call independent of anything this test or the app does wrong,
+# surfacing as NoSuchWindowException ("target window already closed") on
+# whatever WebDriver call happens to run next. A single rerun rides out
+# that one-off crash instead of failing the whole (long) flow on
+# infrastructure noise; _close_meet_tab()'s own cleanup is now resilient to
+# the same crash too, so a rerun starts from a clean, recovered session
+# rather than a stranded one.
+@pytest.mark.flaky(reruns=1, only_rerun=["NoSuchWindowException"])
 def test_meet_interact_upload_and_validate_features(logged_in_driver):
     # One chained flow rather than independent test functions because each
     # stage depends on state the previous stage left behind: the file

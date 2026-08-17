@@ -628,6 +628,21 @@ class AgentBuildPage:
             EC.element_to_be_clickable(self.output_type_video_button)
         ).click()
 
+    def is_output_type_video_selected(self):
+        """These I/O type buttons are plain click-to-toggle pills — no
+        aria-pressed/data-state attribute, confirmed live — so selected
+        state is read from the 'bg-indigo-50' class Tailwind applies only
+        when active (unselected falls back to 'bg-background')."""
+        button = self.driver.find_element(*self.output_type_video_button)
+        return "bg-indigo-50" in (button.get_attribute("class") or "")
+
+    @allure.step("Deselect video output type")
+    def deselect_output_type_video(self):
+        if self.is_output_type_video_selected():
+            self.wait.until(
+                EC.element_to_be_clickable(self.output_type_video_button)
+            ).click()
+
     @allure.step("Submit '{file_path}' for upload to knowledge base")
     def submit_upload_file(self, file_path):
         """Sends the file to the upload input and returns as soon as the request is
@@ -820,11 +835,27 @@ class AgentBuildPage:
         # starts with "agent-"), excluding the orchestrator and mcp tool nodes.
         # Using data_id to open the card avoids ambiguous text-search matches
         # when the name also appears in another card's description text.
+        #
+        # A platform/MCP tool attached directly to a sub-agent (rather than
+        # the orchestrator) gets a data-id like 'agent-1-mcp-0' — it still
+        # starts with 'agent-' (matching self.sub_agent_node's selector) and
+        # has real text, so without this exclusion it slips into the result
+        # indistinguishable from a genuine sub-agent. Confirmed live and
+        # reproducible: test_sub_agent_empty_instructions_validation's
+        # random.choice() picked one ('Convert_Language') instead of a real
+        # sub-agent, opened its Type/Price/Categories tool panel instead of
+        # an agent's config panel, and then timed out forever waiting for
+        # an Instructions eye-toggle that panel doesn't have — the exact
+        # same failure mode get_agent_card_names() below already documents
+        # and excludes "mcp" data-ids for; this method's own docstring
+        # claimed the same exclusion but never actually implemented it.
         nodes = self.driver.find_elements(*self.sub_agent_node)
 
         cards = []
         for node in nodes:
             data_id = node.get_attribute("data-id") or ""
+            if "mcp" in data_id:
+                continue
             text = node.text.strip()
             if not text:
                 continue
