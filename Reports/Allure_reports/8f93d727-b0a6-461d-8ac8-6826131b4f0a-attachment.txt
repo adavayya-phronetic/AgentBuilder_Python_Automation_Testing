@@ -1,0 +1,2 @@
+Latency before interaction for 'Recipe Assistant 1787131056': 2124.50 ms
+Latency updated from '2124.50 ms' to '2121.75 ms' after the interaction.

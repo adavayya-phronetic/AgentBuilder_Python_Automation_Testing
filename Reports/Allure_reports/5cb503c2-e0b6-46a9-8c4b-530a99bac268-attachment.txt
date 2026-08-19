@@ -1,0 +1,8 @@
+Created tool 'QA_Automation_Tool_Upload_1787134049'.
+Confirmed non-.py upload was rejected for tool 'QA_Automation_Tool_Upload_1787134049'.
+Updated tool 'QA_Automation_Tool_Upload_1787134049' with calculator.py.
+Functions found in Test your tool panel: ['add', 'subtract', 'multiply', 'divide']
+Test output for add(['a', 'b']): '[\n  {\n    "type": "text",\n    "text": "50",\n    "annotations": null,\n    "_meta": null\n  }\n]'
+Test output for subtract(['a', 'b']): '[\n  {\n    "type": "text",\n    "text": "0",\n    "annotations": null,\n    "_meta": null\n  }\n]'
+Test output for multiply(['a', 'b']): '[\n  {\n    "type": "text",\n    "text": "625",\n    "annotations": null,\n    "_meta": null\n  }\n]'
+Test output for divide(['a', 'b']): '[\n  {\n    "type": "text",\n    "text": "1.0",\n    "annotations": null,\n    "_meta": null\n  }\n]'

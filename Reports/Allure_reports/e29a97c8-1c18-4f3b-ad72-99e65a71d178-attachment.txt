@@ -1,0 +1,1 @@
+Activity entry 'Quiz Question Generator' redirected to its Traces page: https://agent-builder.phronetic.ai/traces/agnt_28f1ad0f-775f-4f9a-8619-f5163517e423?tab=traces&session_page=1&trace_page=1

@@ -1,0 +1,2 @@
+Current URL: https://auth.phronetic.ai/login?client_id=agent-builder&redirect_uri=https%3A%2F%2Fagent-builder.phronetic.ai%2Fauth%2Fcallback&code_challenge=RT-Se1u1XYpL-X98cdu3YEjsPEjhrlRXFnsuDmhM7ZE
+Dashboard loaded with all widgets and summary cards.

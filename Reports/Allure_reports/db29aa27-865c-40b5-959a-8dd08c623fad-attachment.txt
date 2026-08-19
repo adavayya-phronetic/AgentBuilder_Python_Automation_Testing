@@ -1,0 +1,2 @@
+Confirmed empty-instructions validation error for sub-agent 'Task Notification Agent' of 'Recipe Assistant 1787133144'.
+Restored original instructions for sub-agent 'Task Notification Agent'.

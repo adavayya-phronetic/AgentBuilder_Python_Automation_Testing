@@ -1,1 +1,0 @@
-Last 30 Days option selected successfully; Latency: 8081.67 ms

@@ -1,2 +1,0 @@
-Session Performance count before filter: 62
-Session Performance count for the filtered date: 0

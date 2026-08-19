@@ -1,2 +1,0 @@
-Credit Usage amount before filter: ₹381.85
-Credit Usage graph correctly shows the empty state for the filtered date (amount before filter was '₹381.85').

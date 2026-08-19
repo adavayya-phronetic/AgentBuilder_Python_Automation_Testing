@@ -1,2 +1,0 @@
-Latency before filter change: 0.00 ms
-Latency updated to '8945.83 ms' for the selected range.

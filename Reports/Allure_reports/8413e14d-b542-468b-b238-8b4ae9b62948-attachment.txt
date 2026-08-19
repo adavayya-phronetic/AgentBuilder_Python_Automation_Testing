@@ -1,0 +1,4 @@
+Agent: Recipe Assistant 1787133144
+Card: Task Organization Orchestrator
+Provider: Bedrock
+Model: Mistral Large 3

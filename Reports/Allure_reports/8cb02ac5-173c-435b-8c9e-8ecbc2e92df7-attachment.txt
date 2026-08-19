@@ -1,1 +1,0 @@
-Activity entry 'Recipe Assistant 1786538588' redirected to its Traces page: https://agent-builder.phronetic.ai/traces/agnt_ae2719ea-76c5-47d7-b349-c149a2654a1e?tab=traces&session_page=1&trace_page=1

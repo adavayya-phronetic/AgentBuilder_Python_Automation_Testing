@@ -1,0 +1,2 @@
+Opened Analytics for agent 'Recipe Assistant 1786950047'.
+Analytics page loaded with all widgets: ['Latency', 'Task Completion', 'Engagement Time', 'Security Risks', 'CSAT Score', 'Cost']

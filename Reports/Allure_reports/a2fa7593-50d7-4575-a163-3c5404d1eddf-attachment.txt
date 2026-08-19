@@ -1,0 +1,3 @@
+Confirmed empty-name validation error for orchestrator of 'Recipe Assistant 1787133144'.
+Confirmed non-alphanumeric name triggers inline error for orchestrator of 'Recipe Assistant 1787133144'.
+Confirmed original name restored cleanly for orchestrator of 'Recipe Assistant 1787133144' with no validation errors.
