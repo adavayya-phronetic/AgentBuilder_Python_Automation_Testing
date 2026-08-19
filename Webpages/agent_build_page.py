@@ -632,8 +632,18 @@ class AgentBuildPage:
         """These I/O type buttons are plain click-to-toggle pills — no
         aria-pressed/data-state attribute, confirmed live — so selected
         state is read from the 'bg-indigo-50' class Tailwind applies only
-        when active (unselected falls back to 'bg-background')."""
-        button = self.driver.find_element(*self.output_type_video_button)
+        when active (unselected falls back to 'bg-background').
+
+        Waits for the button's presence rather than a bare find_element:
+        existing callers already interact with the button right before
+        this runs so it's always on the page by then, but a caller landing
+        here straight off a fresh page navigation (e.g. right after
+        clicking an agent card) can't assume the Build page has finished
+        rendering the Details section yet.
+        """
+        button = self.wait.until(
+            EC.presence_of_element_located(self.output_type_video_button)
+        )
         return "bg-indigo-50" in (button.get_attribute("class") or "")
 
     @allure.step("Deselect video output type")

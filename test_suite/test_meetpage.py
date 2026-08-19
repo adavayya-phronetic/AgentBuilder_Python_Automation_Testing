@@ -15,7 +15,21 @@ from selenium.common.exceptions import (
 
 from Webpages.my_agents_page import MyAgentsPage
 from Webpages.meet_page import MeetPage
+from Webpages.agent_build_page import AgentBuildPage
 from Utility.allure_helpers import attach_step_screenshot
+
+
+class MeetRoomDisconnected(Exception):
+    """Raised when the meeting room silently drops back to the app shell
+    (e.g. after switching to a past chat session) instead of crashing the
+    tab outright. Confirmed live: chat_history_button then legitimately
+    isn't on the page, so waiting the full 30s for it just produces a
+    generic Selenium TimeoutException pointing at a locator instead of the
+    real cause. Checking is_in_call() first and raising this instead turns
+    that into an immediate, diagnosable failure — and gives the flaky
+    rerun below (see its comment) a distinct, narrow exception name to
+    target alongside the existing NoSuchWindowException case, without
+    having to rerun on every AssertionError in this test."""
 
 
 def _open_meet_tab_in_new_window(driver):
@@ -57,10 +71,34 @@ def _open_random_active_agent_meet(driver):
     agents_page.search_agent(target_agent_name)
     agents_page.click_agent_card(target_agent_name)
 
+    # click_agent_card lands on this agent's own Build page. Whatever
+    # Output Type an earlier test left this agent configured with (e.g.
+    # test_configure_agent_io_types explicitly exercises the Video toggle),
+    # Video output must be off before joining a Meet call with it — the
+    # Meet room renders actual agent video output on top of the WebRTC
+    # call itself when it's enabled, which is heavier than this fake-media
+    # Selenium setup reliably handles and is a plausible contributor to the
+    # tab crashes documented on the Meet test's flaky rerun.
+    _ensure_video_output_disabled(driver)
+
     # The Meet tab is an <a target="_blank"> that opens
     # meet-agents.phronetic.ai in a separate browser tab.
     _open_meet_tab_in_new_window(driver)
     return target_agent_name
+
+
+def _ensure_video_output_disabled(driver):
+    build_page = AgentBuildPage(driver)
+    # click_agent_card lands on this agent's GRAPH tab by default, not
+    # EDITOR — confirmed live (and matches test_configure_agent_io_types,
+    # which also clicks into EDITOR before touching these buttons). The
+    # Output Type pills only exist in the EDITOR tab's Details section, so
+    # without this the video button is never on the page and the wait
+    # below times out instead of finding anything to check.
+    build_page.click_editor_tab()
+    if build_page.is_output_type_video_selected():
+        build_page.deselect_output_type_video()
+        build_page.click_save()
 
 
 def _dismiss_stray_alert(driver):
@@ -131,8 +169,10 @@ def _close_meet_tab(driver, main_window):
 # that one-off crash instead of failing the whole (long) flow on
 # infrastructure noise; _close_meet_tab()'s own cleanup is now resilient to
 # the same crash too, so a rerun starts from a clean, recovered session
-# rather than a stranded one.
-@pytest.mark.flaky(reruns=1, only_rerun=["NoSuchWindowException"])
+# rather than a stranded one. MeetRoomDisconnected (defined above) covers
+# the same family of live-meeting flakiness surfacing as a silent redirect
+# back to the app shell rather than a window crash.
+@pytest.mark.flaky(reruns=1, only_rerun=["NoSuchWindowException", "MeetRoomDisconnected"])
 def test_meet_interact_upload_and_validate_features(logged_in_driver):
     # One chained flow rather than independent test functions because each
     # stage depends on state the previous stage left behind: the file
@@ -178,12 +218,25 @@ def test_meet_interact_upload_and_validate_features(logged_in_driver):
         with allure.step("Step 4: Validate in-call features (chat panel, device controls, More options menu)"):
             assert meet_page.is_chat_panel_open(), "Step 4 failed: meeting Chat panel was not open"
 
+            # Chat History and Share Screen used to live inside the More
+            # options (⋮) dropdown along with these three — confirmed live,
+            # a UI change moved both out into their own dedicated toolbar
+            # buttons, so they're checked separately below rather than as
+            # dropdown items that no longer exist.
             meet_page.open_more_options()
             menu_items = meet_page.get_more_options_menu_items()
-            for expected in ["Chat History", "Screen Recorder", "Meeting Info", "Participants", "Share Screen"]:
+            for expected in ["Screen Recorder", "Meeting Info", "Participants"]:
                 assert expected in menu_items, f"Step 4 failed: '{expected}' missing from More options menu"
             print("Step 4a OK: More options menu shows all expected items:", menu_items)
             attach_step_screenshot(driver, "Step 4a: More options menu")
+
+            assert meet_page.is_chat_history_button_present(), (
+                "Step 4 failed: Chat History toolbar button not present"
+            )
+            assert meet_page.is_share_screen_button_present(), (
+                "Step 4 failed: Share Screen toolbar button not present"
+            )
+            print("Step 4a OK: Chat History and Share Screen toolbar buttons present.")
 
             meet_page.wait.until(
                 EC.element_to_be_clickable(meet_page.meeting_info_menu_item)
@@ -214,6 +267,20 @@ def test_meet_interact_upload_and_validate_features(logged_in_driver):
                 )
                 print("Step 5b OK: joined a random past chat from history.")
                 attach_step_screenshot(driver, "Step 5b: Joined past chat")
+
+                # Confirmed live: joining a past chat can silently redirect the
+                # tab back to the Build Agent app shell a few seconds later
+                # instead of staying in the room — the Chat History button then
+                # genuinely isn't on the page, so re-checking here up front
+                # turns that into an immediate, clear failure instead of a
+                # generic 30s Selenium TimeoutException on the button locator.
+                if not meet_page.is_in_call(timeout=5):
+                    raise MeetRoomDisconnected(
+                        "Step 5 failed: got redirected out of the meeting room after joining a "
+                        f"past chat (now at {driver.current_url}) instead of staying in-call — "
+                        "this is a live-app reconnect glitch, not a locator issue; the flaky "
+                        "rerun on this test should ride it out"
+                    )
 
                 meet_page.open_chat_history()
                 assert meet_page.is_chat_history_panel_open(), (

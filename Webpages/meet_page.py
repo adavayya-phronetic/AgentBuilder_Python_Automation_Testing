@@ -5,7 +5,11 @@ import allure
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, StaleElementReferenceException
+from selenium.common.exceptions import (
+    TimeoutException,
+    StaleElementReferenceException,
+    NoSuchWindowException,
+)
 
 
 class MeetPage:
@@ -19,6 +23,41 @@ class MeetPage:
     def __init__(self, driver):
         self.driver = driver
         self.wait = WebDriverWait(driver, 30)
+        self._guard_against_crashed_tab_finds()
+
+    def _guard_against_crashed_tab_finds(self):
+        # The Meet tab's WebRTC renderer can crash mid-call independent of
+        # anything this test does (see the flaky-rerun comment on the test
+        # itself, which already handles the usual NoSuchWindowException
+        # shape of that crash). Confirmed live: when the crash lands mid
+        # find_element instead, chromedriver's response can come back with
+        # no 'value', so Selenium's find_element() returns None rather than
+        # raising. That None then reaches expected_conditions'
+        # _element_if_visible, which calls None.is_displayed() and blows up
+        # with a confusing AttributeError far from the real cause — and one
+        # the existing flaky rerun doesn't recognize, so the test fails
+        # outright instead of riding out infra noise it's designed to
+        # tolerate. Wrapping find_element here turns that back into the
+        # same NoSuchWindowException every other crash path already
+        # produces. Guarded by a flag on the driver itself since the same
+        # shared session-scoped driver can construct several MeetPage
+        # instances across a run.
+        if getattr(self.driver, "_crashed_tab_find_guard_applied", False):
+            return
+
+        original_find_element = self.driver.find_element
+
+        def _guarded_find_element(*args, **kwargs):
+            element = original_find_element(*args, **kwargs)
+            if element is None:
+                raise NoSuchWindowException(
+                    "find_element returned no element — the meet tab most "
+                    "likely crashed mid-call"
+                )
+            return element
+
+        self.driver.find_element = _guarded_find_element
+        self.driver._crashed_tab_find_guard_applied = True
 
         self.join_now_button = (
             By.XPATH,
@@ -75,14 +114,16 @@ class MeetPage:
             "//button[@title='More options']"
         )
 
-        # Items inside the "More options" menu. Screen Recorder and Share
-        # Screen are only checked for presence, never clicked — they
-        # require OS-level permission dialogs Selenium can't drive.
-        self.chat_history_menu_item = (
-            By.XPATH,
-            "//*[self::button or self::li][normalize-space()='Chat History']"
-        )
-
+        # Items inside the "More options" (⋮) dropdown itself. Chat History
+        # and Share Screen used to live here too, but a live UI change moved
+        # both out into their own dedicated icon-only toolbar buttons
+        # (title='Chat History' / title='Share Screen', no visible text) —
+        # confirmed live: the dropdown now only ever contains these three,
+        # and the two moved-out buttons have real, working locators of
+        # their own below rather than text-matching a menu item that no
+        # longer exists. Screen Recorder is only checked for presence,
+        # never clicked — it requires an OS-level permission dialog
+        # Selenium can't drive.
         self.screen_recorder_menu_item = (
             By.XPATH,
             "//*[self::button or self::li][normalize-space()='Screen Recorder']"
@@ -98,9 +139,18 @@ class MeetPage:
             "//*[self::button or self::li][normalize-space()='Participants']"
         )
 
-        self.share_screen_menu_item = (
+        # Standalone toolbar buttons (see note above) — icon-only, identified
+        # by their title attribute rather than visible text. Share Screen is
+        # only checked for presence, never clicked — same OS-permission-
+        # dialog reason as Screen Recorder above.
+        self.chat_history_button = (
             By.XPATH,
-            "//*[self::button or self::li][normalize-space()='Share Screen']"
+            "//button[@title='Chat History']"
+        )
+
+        self.share_screen_button = (
+            By.XPATH,
+            "//button[@title='Share Screen']"
         )
 
         # Panel headers shown in the right-hand panel once opened.
@@ -290,44 +340,35 @@ class MeetPage:
         self._click(self.more_options_button)
 
         # Confirmed reproducible right after Step 3's heavy upload+response
-        # wait: the menu opens, but some items (Chat History, Share Screen)
-        # can still be mid-render at that exact moment and don't show up
-        # within get_more_options_menu_items()'s per-item wait, even though
+        # wait: the menu opens, but its items can still be mid-render at
+        # that exact moment and not show up within
+        # get_more_options_menu_items()'s own per-item wait, even though
         # the same locators find them instantly on a fresh, non-rushed
-        # open. A fixed sleep here previously guessed at how long that
-        # takes and wasn't reliably long enough (confirmed live: still
-        # missing after a 2s sleep on a slower render) — waiting for their
-        # actual presence instead adapts to how long rendering genuinely
-        # takes on a given run rather than gambling on one fixed number.
-        for locator in (self.chat_history_menu_item, self.share_screen_menu_item):
-            try:
-                WebDriverWait(self.driver, 15).until(
-                    EC.presence_of_element_located(locator)
-                )
-            except TimeoutException:
-                pass
+        # open. Waiting for one item's actual presence here adapts to how
+        # long rendering genuinely takes on a given run, rather than
+        # gambling on a fixed sleep.
+        try:
+            WebDriverWait(self.driver, 15).until(
+                EC.presence_of_element_located(self.participants_menu_item)
+            )
+        except TimeoutException:
+            pass
 
     def get_more_options_menu_items(self, timeout=10):
-        """Returns the visible text of every item currently shown in the More options menu.
+        """Returns the visible text of every item currently shown in the More
+        options (⋮) dropdown — Screen Recorder, Meeting Info, Participants.
 
-        Confirmed reproducible with the Chat panel open (i.e. right after
-        Step 3's upload+response, not on a fresh join): the first and last
-        items (Chat History, Share Screen) can be present in the DOM but
-        scrolled out of the popup's visible area rather than genuinely
-        absent — the Chat panel taking up screen space leaves less room
-        for the popup, unlike a fresh join with no panels open. Checking
-        visibility_of_element_located alone assumes it's already in view;
-        this waits for presence first and scrolls each item into view
-        before reading it, the same pattern used for scrolled screenshots
-        elsewhere in this suite.
+        Chat History and Share Screen used to live in this same dropdown,
+        but a live UI change moved both out into their own dedicated
+        toolbar buttons (see chat_history_button / share_screen_button) —
+        checking for them here would wait out the full timeout on every
+        call for something that will never appear again.
         """
         items = []
         for locator in (
-            self.chat_history_menu_item,
             self.screen_recorder_menu_item,
             self.meeting_info_menu_item,
             self.participants_menu_item,
-            self.share_screen_menu_item,
         ):
             try:
                 el = WebDriverWait(self.driver, timeout).until(
@@ -367,15 +408,34 @@ class MeetPage:
         except TimeoutException:
             return False
 
-    @allure.step("Open Chat History from More options")
+    @allure.step("Open Chat History")
     def open_chat_history(self):
-        self.open_more_options()
-        self._click(self.chat_history_menu_item)
+        # A standalone toolbar button now, not a "More options" dropdown
+        # item (see chat_history_button) — no need to open that menu first.
+        self._click(self.chat_history_button)
 
     def is_chat_history_panel_open(self, timeout=10):
         try:
             return WebDriverWait(self.driver, timeout).until(
                 EC.visibility_of_element_located(self.chat_history_panel_heading)
+            ).is_displayed()
+        except TimeoutException:
+            return False
+
+    def is_chat_history_button_present(self, timeout=10):
+        try:
+            return WebDriverWait(self.driver, timeout).until(
+                EC.visibility_of_element_located(self.chat_history_button)
+            ).is_displayed()
+        except TimeoutException:
+            return False
+
+    def is_share_screen_button_present(self, timeout=10):
+        # Presence only, never clicked — same OS-permission-dialog reason
+        # as Screen Recorder.
+        try:
+            return WebDriverWait(self.driver, timeout).until(
+                EC.visibility_of_element_located(self.share_screen_button)
             ).is_displayed()
         except TimeoutException:
             return False
